@@ -32,11 +32,14 @@
         "node-notifier": "*"
     },
     "private": true,
+    "main": "./index.js",
     "repository": {
         "type": "git",
         "url": "git+ssh://git@git.nex9.com/repo/imago.gulp.angular"
     },
     "readme": "Imago Angular",
     "_id": "imago-gulp-angular@0.0.1",
-    "_from": "imago-gulp-angular@~0.0.1"
+    "_from": "imago-gulp-angular@~0.0.1",
+    "_shasum": "51a49348640755c7ba578a554fccb331ce5440be",
+    "_resolved": "git+ssh://git@git.nex9.com/repo/imago.gulp.angular#7a7559a28cf9becdc3f6c2ddbbfeed1916c547e5"
 }
