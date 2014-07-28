@@ -1,7 +1,7 @@
 {
     "name": "imago-gulp-angular",
     "version": "0.0.1",
-    "description": "Angular theme for NEX9 LLC",
+    "description": "Angular gulp for NEX9 LLC",
     "main": "gulpfile.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
@@ -9,7 +9,6 @@
     "author": {
         "name": "Nex9 LLC"
     },
-    "license": "ISC",
     "devDependencies": {
         "browser-sync": "*",
         "coffee-script": "*",
@@ -36,5 +35,6 @@
     "repository": {
         "type": "git",
         "url": "git+ssh://git@git.nex9.com/repo/imago.gulp.angular"
-    }
+    },
+    "readme": "Imago Angular"
 }
