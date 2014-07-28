@@ -1,0 +1,38 @@
+{
+    "name": "imago-gulp-angular",
+    "version": "0.0.1",
+    "description": "Angular theme for NEX9 LLC",
+    "main": "gulpfile.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Nex9 LLC",
+    "license": "ISC",
+    "dependencies": {
+        "coffee-script": "*",
+        "gulp": "*",
+        "gulp-angular-templatecache": "*",
+        "gulp-autoprefixer": "*",
+        "gulp-coffee": "*",
+        "gulp-coffeelint": "*",
+        "gulp-concat": "*",
+        "gulp-imagemin": "*",
+        "gulp-jade": "*",
+        "gulp-ng-classify": "*",
+        "gulp-order": "*",
+        "gulp-plumber": "*",
+        "gulp-sass": "*",
+        "gulp-sourcemaps": "*",
+        "gulp-uglify": "*",
+        "gulp-util": "*",
+        "gulp-watch": "*",
+        "gutil": "*"
+    },
+    "devDependencies": {
+        "browser-sync": "*",
+        "connect-modrewrite": "*",
+        "gulp-if": "*",
+        "gulp-ruby-sass": "*",
+        "node-notifier": "*"
+    }
+}
