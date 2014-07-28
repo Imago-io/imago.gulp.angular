@@ -12,7 +12,6 @@ jade            = require 'gulp-jade'
 
 ngClassify      = require 'gulp-ng-classify'
 
-order           = require 'gulp-order'
 plumber         = require 'gulp-plumber'
 prefix          = require 'gulp-autoprefixer'
 sass            = require 'gulp-sass'
@@ -27,10 +26,7 @@ modRewrite      = require 'connect-modrewrite'
 Notification    = require 'node-notifier'
 notifier        = new Notification()
 exec            = require('child_process').exec
-config          = require './lib/configGulp'
-
-
-
+config          = require '../../lib/configGulp'
 
 dest = 'public'
 src = 'app'

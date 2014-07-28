@@ -8,8 +8,10 @@
     },
     "author": "Nex9 LLC",
     "license": "ISC",
-    "dependencies": {
+    "devDependencies": {
+        "browser-sync": "*",
         "coffee-script": "*",
+        "connect-modrewrite": "*",
         "gulp": "*",
         "gulp-angular-templatecache": "*",
         "gulp-autoprefixer": "*",
@@ -19,20 +21,14 @@
         "gulp-imagemin": "*",
         "gulp-jade": "*",
         "gulp-ng-classify": "*",
-        "gulp-order": "*",
         "gulp-plumber": "*",
+        "gulp-ruby-sass": "*",
         "gulp-sass": "*",
         "gulp-sourcemaps": "*",
         "gulp-uglify": "*",
         "gulp-util": "*",
         "gulp-watch": "*",
-        "gutil": "*"
-    },
-    "devDependencies": {
-        "browser-sync": "*",
-        "connect-modrewrite": "*",
-        "gulp-if": "*",
-        "gulp-ruby-sass": "*",
-        "node-notifier": "*"
+        "gutil": "*",
+        "node-notifier": "*",
     }
 }
