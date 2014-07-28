@@ -7,7 +7,6 @@ concat          = require 'gulp-concat'
 
 gulp            = require 'gulp'
 
-imagemin        = require 'gulp-imagemin'
 jade            = require 'gulp-jade'
 
 ngClassify      = require 'gulp-ng-classify'
@@ -102,11 +101,6 @@ gulp.task "scripts", ->
     )
     .pipe concat config.targets.scripts
     .pipe gulp.dest dest
-
-gulp.task "images", ->
-  gulp.src("#{src}/static/*.*")
-    .pipe imagemin()
-    .pipe gulp.dest("#{dest}/static")
 
 gulp.task "uncss", ->
   gulp.src("#{dest}/application.css")
