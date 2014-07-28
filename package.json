@@ -32,6 +32,7 @@
         "gutil": "*",
         "node-notifier": "*"
     },
+    "private": true,
     "repository": {
         "type": "git",
         "url": "git+ssh://git@git.nex9.com/repo/imago.gulp.angular"
