@@ -25,10 +25,10 @@ modRewrite      = require 'connect-modrewrite'
 Notification    = require 'node-notifier'
 notifier        = new Notification()
 exec            = require('child_process').exec
-config          = require '../../config-gulp'
+config          = require '../../gulp'
 
-dest = 'public'
-src = 'app'
+src = config.src
+dest = config.dest
 
 generateSass = () ->
   gulp.src config.paths.sass
