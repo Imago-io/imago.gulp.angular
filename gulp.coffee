@@ -25,7 +25,7 @@ modRewrite      = require 'connect-modrewrite'
 Notification    = require 'node-notifier'
 notifier        = new Notification()
 exec            = require('child_process').exec
-config          = require '../../lib/config-gulp'
+config          = require '../../config-gulp'
 
 dest = 'public'
 src = 'app'
