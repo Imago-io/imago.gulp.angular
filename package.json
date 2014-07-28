@@ -1,15 +1,18 @@
 {
     "name": "imago-gulp-angular",
     "version": "0.0.1",
-    "description": "Angular theme for NEX9 LLC",
+    "description": "Angular gulp for NEX9 LLC",
     "main": "gulpfile.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
-    "author": "Nex9 LLC",
-    "license": "ISC",
+    "author": {
+        "name": "Nex9 LLC"
+    },
     "dependencies": {
+        "browser-sync": "*",
         "coffee-script": "*",
+        "connect-modrewrite": "*",
         "gulp": "*",
         "gulp-angular-templatecache": "*",
         "gulp-autoprefixer": "*",
@@ -19,20 +22,22 @@
         "gulp-imagemin": "*",
         "gulp-jade": "*",
         "gulp-ng-classify": "*",
-        "gulp-order": "*",
         "gulp-plumber": "*",
+        "gulp-ruby-sass": "*",
         "gulp-sass": "*",
         "gulp-sourcemaps": "*",
         "gulp-uglify": "*",
         "gulp-util": "*",
         "gulp-watch": "*",
-        "gutil": "*"
-    },
-    "devDependencies": {
-        "browser-sync": "*",
-        "connect-modrewrite": "*",
-        "gulp-if": "*",
-        "gulp-ruby-sass": "*",
+        "gutil": "*",
         "node-notifier": "*"
-    }
+    },
+    "private": true,
+    "repository": {
+        "type": "git",
+        "url": "git+ssh://git@git.nex9.com/repo/imago.gulp.angular"
+    },
+    "readme": "Imago Angular",
+    "_id": "imago-gulp-angular@0.0.1",
+    "_from": "imago-gulp-angular@~0.0.1"
 }
