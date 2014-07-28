@@ -36,5 +36,7 @@
         "type": "git",
         "url": "git+ssh://git@git.nex9.com/repo/imago.gulp.angular"
     },
-    "readme": "Imago Angular"
+    "readme": "Imago Angular",
+    "_id": "imago-gulp-angular@0.0.1",
+    "_from": "imago-gulp-angular@~0.0.1"
 }
