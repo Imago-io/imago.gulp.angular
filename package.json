@@ -13,7 +13,6 @@
         "browser-sync": "*",
         "coffee-script": "*",
         "connect-modrewrite": "*",
-        "gulp": "*",
         "gulp-angular-templatecache": "*",
         "gulp-autoprefixer": "*",
         "gulp-coffee": "*",
