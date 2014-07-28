@@ -32,5 +32,9 @@
         "gulp-watch": "*",
         "gutil": "*",
         "node-notifier": "*"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+ssh://git@git.nex9.com/repo/imago.gulp.angular"
     }
 }
