@@ -29,6 +29,6 @@
         "gulp-util": "*",
         "gulp-watch": "*",
         "gutil": "*",
-        "node-notifier": "*",
+        "node-notifier": "*"
     }
 }
