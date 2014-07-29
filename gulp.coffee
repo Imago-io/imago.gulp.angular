@@ -25,7 +25,13 @@ modRewrite      = require 'connect-modrewrite'
 Notification    = require 'node-notifier'
 notifier        = new Notification()
 exec            = require('child_process').exec
+
+pkg             = require './package.json'
 config          = require '../../gulp'
+
+updateNotifier({packageName: pkg.name, packageVersion: pkg.version}).notify()
+
+
 
 src = config.src
 dest = config.dest
@@ -102,20 +108,9 @@ gulp.task "scripts", ->
     .pipe concat config.targets.scripts
     .pipe gulp.dest dest
 
-gulp.task "uncss", ->
-  gulp.src("#{dest}/application.css")
-    .pipe uncss(html: ["index.html"])
-    .pipe gulp.dest(destinationFolder)
-
-minify = ->
-  gulp.src "#{dest}/#{config.targets.js}"
-    .pipe uglify()
-    .pipe gulp.dest dest
-
-gulp.task "minify", ['build'], minify
 
 combineJs = (production = false) ->
-  # We need to rethrow jade errors to see them
+
   rethrow = (err, filename, lineno) -> throw err
 
   files = [
@@ -142,16 +137,7 @@ gulp.task "prepare", ["js"], ->
   generateSass()
   combineJs()
 
-gulp.task "build", ["js"], ->
-  generateSass()
-  combineJs()
-
 gulp.task "b", ["build"]
-
-gulp.task "deploy", ["build"], ->
-  exec "deploy .", (error, stdout, stderr) ->
-    console.log "result: " + stdout
-    console.log "exec error: " + error  if error isnt null
 
 
 ## Essentials Task
@@ -166,7 +152,6 @@ gulp.task "browser-sync", ->
     # logConnections: false
     debugInfo: false
     notify: false
-    ghostMode: false
 
 gulp.task "watch", ["prepare", "browser-sync"], ->
   watch
@@ -201,6 +186,18 @@ gulp.task "watch", ["prepare", "browser-sync"], ->
     glob: sources, emitOnGlob: false
   , ->
     gulp.start('combine')
+
+minify = ->
+  gulp.src "#{dest}/#{config.targets.js}"
+    .pipe uglify()
+    .pipe gulp.dest dest
+
+gulp.task "build", ['prepare'], minify
+
+gulp.task "deploy", ["build"], ->
+  exec "deploy .", (error, stdout, stderr) ->
+    console.log "result: " + stdout
+    console.log "exec error: " + error  if error isnt null
 
 reportError = (err) ->
   gutil.beep()
