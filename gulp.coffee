@@ -26,6 +26,8 @@ Notification    = require 'node-notifier'
 notifier        = new Notification()
 exec            = require('child_process').exec
 
+
+updateNotifier  = require 'update-notifier'
 pkg             = require './package.json'
 config          = require '../../gulp'
 
