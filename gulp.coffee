@@ -189,7 +189,8 @@ gulp.task "watch", ["prepare", "browser-sync"], ->
 
 minify = ->
   gulp.src "#{dest}/#{config.targets.js}"
-    .pipe uglify()
+    .pipe uglify
+      mangle : false
     .pipe gulp.dest dest
 
 gulp.task "build", ['prepare'], minify
