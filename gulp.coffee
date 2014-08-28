@@ -37,6 +37,8 @@ updateNotifier({packageName: pkg.name, packageVersion: pkg.version}).notify()
 dest = config.dest
 src  = config.src
 
+syncBrowsers = (if typeof config.browserSync is 'boolean' then config.browserSync else true)
+
 generateSass = () ->
   gulp.src config.paths.sass
     .pipe plumber
@@ -152,6 +154,7 @@ gulp.task "browser-sync", ->
       ]
     debugInfo: false
     notify: false
+    ghostMode: syncBrowsers
 
 gulp.task "watch", ["prepare", "browser-sync"], ->
   watch
