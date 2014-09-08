@@ -34,9 +34,10 @@ config          = require '../../gulp'
 updateNotifier({packageName: pkg.name, packageVersion: pkg.version}).notify()
 
 
-
 src = config.src
 dest = config.dest
+
+syncBrowsers = (if typeof config.browserSync is 'boolean' then config.browserSync else true)
 
 generateSass = () ->
   gulp.src config.paths.sass
@@ -151,9 +152,10 @@ gulp.task "browser-sync", ->
       middleware: [
         modRewrite ['^([^.]+)$ /index.html [L]']
       ]
-    # logConnections: false
     debugInfo: false
     notify: false
+    ghostMode: syncBrowsers
+
 
 gulp.task "watch", ["prepare", "browser-sync"], ->
   watch
