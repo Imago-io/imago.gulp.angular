@@ -22,7 +22,6 @@
         "gulp-ng-classify": "*",
         "gulp-plumber": "*",
         "gulp-ruby-sass": "*",
-        "gulp-sass": "*",
         "gulp-sourcemaps": "*",
         "gulp-uglify": "*",
         "gulp-util": "*",
