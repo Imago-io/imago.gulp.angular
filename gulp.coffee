@@ -207,7 +207,12 @@ gulp.task "bower", ->
     console.log "result: " + stdout
     console.log "exec error: " + error  if error isnt null
 
-gulp.task "update", ['bower'], ->
+gulp.task "npm", ->
+  exec "npm update", (error, stdout, stderr) ->
+    console.log "result: " + stdout
+    console.log "exec error: " + error  if error isnt null
+
+gulp.task "update", ['npm', 'bower'], ->
   gulp.src('bower_components/imago.widgets.angular/css/**/fonts/*.*')
     .pipe(gulp.dest('public/i'))
 
