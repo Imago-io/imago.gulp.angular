@@ -18,6 +18,7 @@
         "gulp-coffee": "*",
         "gulp-coffeelint": "*",
         "gulp-concat": "*",
+        "gulp-flatten": "0.0.3",
         "gulp-jade": "*",
         "gulp-ng-classify": "*",
         "gulp-plumber": "*",

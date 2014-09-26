@@ -4,6 +4,7 @@ coffee          = require 'gulp-coffee'
 coffeelint      = require 'gulp-coffeelint'
 
 concat          = require 'gulp-concat'
+flatten         = require 'gulp-flatten'
 
 gulp            = require 'gulp'
 
@@ -212,9 +213,10 @@ gulp.task "npm", ->
     console.log "result: " + stdout
     console.log "exec error: " + error  if error isnt null
 
-gulp.task "update", ['npm', 'bower'], ->
-  gulp.src('bower_components/imago.widgets.angular/css/**/fonts/*.*')
-    .pipe(gulp.dest('public/i'))
+gulp.task "update", ->
+  gulp.src('bower_components/imago.widgets.angular/**/fonts/*.*')
+    .pipe(flatten())
+    .pipe(gulp.dest('public/i/fonts'))
 
 reportError = (err) ->
   gutil.beep()
