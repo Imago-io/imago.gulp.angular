@@ -1,42 +1,43 @@
 {
-    "name": "imago-gulp-angular",
-    "version": "0.0.4",
-    "description": "Angular gulp for NEX9 LLC",
-    "main": "./index.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "author": {
-        "name": "Nex9 LLC"
-    },
-    "dependencies": {
-        "browser-sync": "*",
-        "coffee-script": "*",
-        "connect-modrewrite": "*",
-        "gulp-angular-templatecache": "*",
-        "gulp-autoprefixer": "*",
-        "gulp-coffee": "*",
-        "gulp-coffeelint": "*",
-        "gulp-concat": "*",
-        "gulp-flatten": "0.0.3",
-        "gulp-jade": "*",
-        "gulp-ng-classify": "*",
-        "gulp-plumber": "*",
-        "gulp-ruby-sass": "*",
-        "gulp-sourcemaps": "*",
-        "gulp-uglify": "*",
-        "gulp-util": "*",
-        "gulp-watch": "0.7.1",
-        "gutil": "*",
-        "node-notifier": "*",
-        "update-notifier": "*"
-    },
-    "private": true,
-    "repository": {
-        "type": "git",
-        "url": "git+ssh://git@git.nex9.com/repo/imago.gulp.angular"
-    },
-    "readme": "Imago Angular",
-    "_id": "imago-gulp-angular@0.0.1",
-    "_from": "imago-gulp-angular@~0.0.1"
+  "name": "imago-gulp-angular",
+  "version": "0.0.4",
+  "description": "Angular gulp for NEX9 LLC",
+  "main": "./index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": {
+    "name": "Nex9 LLC"
+  },
+  "dependencies": {
+    "browser-sync": "*",
+    "coffee-script": "*",
+    "connect-modrewrite": "*",
+    "gulp-angular-templatecache": "*",
+    "gulp-autoprefixer": "*",
+    "gulp-coffee": "*",
+    "gulp-coffeelint": "*",
+    "gulp-concat": "*",
+    "gulp-flatten": "0.0.3",
+    "gulp-jade": "*",
+    "gulp-ng-classify": "*",
+    "gulp-plumber": "*",
+    "gulp-ruby-sass": "*",
+    "gulp-sourcemaps": "*",
+    "gulp-uglify": "*",
+    "gulp-util": "*",
+    "gulp-watch": "0.7.1",
+    "gutil": "*",
+    "node-notifier": "*",
+    "q": "^1.0.1",
+    "update-notifier": "*"
+  },
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@git.nex9.com/repo/imago.gulp.angular"
+  },
+  "readme": "Imago Angular",
+  "_id": "imago-gulp-angular@0.0.1",
+  "_from": "imago-gulp-angular@~0.0.1"
 }

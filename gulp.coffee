@@ -26,6 +26,7 @@ modRewrite      = require 'connect-modrewrite'
 Notification    = require 'node-notifier'
 notifier        = new Notification()
 exec            = require('child_process').exec
+Q               = require 'q'
 
 
 updateNotifier  = require 'update-notifier'
@@ -204,14 +205,20 @@ gulp.task "deploy", ["build"], ->
     console.log "exec error: " + error  if error isnt null
 
 gulp.task "bower", ->
+  deferred = Q.defer()
   exec "bower update", (error, stdout, stderr) ->
     console.log "result: " + stdout
     console.log "exec error: " + error  if error isnt null
+    deferred.resolve()
+  return deferred.promise
 
 gulp.task "npm", ->
+  deferred = Q.defer()
   exec "npm update", (error, stdout, stderr) ->
     console.log "result: " + stdout
     console.log "exec error: " + error  if error isnt null
+    deferred.resolve()
+  return deferred.promise
 
 gulp.task "update", ['npm', 'bower'], ->
   gulp.src('bower_components/imago.widgets.angular/**/fonts/*.*')
