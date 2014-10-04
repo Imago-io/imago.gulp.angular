@@ -1,4 +1,5 @@
 browserSync     = require 'browser-sync'
+connect         = require 'gulp-connect'
 
 coffee          = require 'gulp-coffee'
 coffeelint      = require 'gulp-coffeelint'
@@ -11,6 +12,9 @@ gulp            = require 'gulp'
 jade            = require 'gulp-jade'
 
 ngClassify      = require 'gulp-ng-classify'
+protractor      = require('gulp-protractor').protractor
+webdriver_standalone = require('gulp-protractor').webdriver_standalone
+webdriver_update= require('gulp-protractor').webdriver_update
 
 plumber         = require 'gulp-plumber'
 prefix          = require 'gulp-autoprefixer'
@@ -39,7 +43,7 @@ updateNotifier({packageName: pkg.name, packageVersion: pkg.version}).notify()
 dest = config.dest
 src  = config.src
 
-syncBrowsers = (if typeof config.browserSync is 'boolean' then config.browserSync else true)
+syncBrowsers = (if typeof config.browserSync then config.browserSync else true)
 
 generateSass = () ->
   gulp.src config.paths.sass
@@ -148,15 +152,18 @@ gulp.task "b", ["build"]
 ## Essentials Task
 
 gulp.task "browser-sync", ->
-  browserSync.init ["#{dest}/index.html"],
-    server:
-      baseDir: "#{dest}"
-      middleware: [
-        modRewrite ['^([^.]+)$ /index.html [L]']
-      ]
-    debugInfo: false
-    notify: false
-    ghostMode: syncBrowsers
+    browserSync.init ["#{dest}/index.html"],
+      server:
+        baseDir: "#{dest}"
+        middleware: [
+          modRewrite ['^([^.]+)$ /index.html [L]']
+        ]
+      debugInfo: false
+      notify: false
+      ghostMode: syncBrowsers
+
+
+
 
 gulp.task "watch", ["prepare", "browser-sync"], ->
   watch
@@ -224,6 +231,23 @@ gulp.task "update", ['npm', 'bower'], ->
   gulp.src('bower_components/imago.widgets.angular/**/fonts/*.*')
     .pipe(flatten())
     .pipe(gulp.dest('public/i/fonts'))
+
+gulp.task "webdriver_update", webdriver_update
+
+gulp.task "webdriver_standalone", webdriver_standalone
+
+gulp.task "testBrowser", ->
+  connect.server
+    root: "#{dest}"
+    fallback: 'index.html'
+
+gulp.task "test", ['testBrowser'], (cb) ->
+  gulp.src(config.paths.tests)
+    .pipe protractor
+      configFile: "tests/protractor.config.js"
+    .on "error", reportError
+    .on "end", () ->
+      connect.serverClose()
 
 reportError = (err) ->
   gutil.beep()
