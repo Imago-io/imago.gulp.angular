@@ -239,7 +239,7 @@ gulp.task "webdriver_standalone", webdriver_standalone
 gulp.task "testBrowser", ->
   connect.server
     root: "#{dest}"
-    fallback: 'index.html'
+    fallback: "#{dest}/index.html"
 
 gulp.task "test", ['testBrowser'], (cb) ->
   gulp.src(config.paths.tests)
