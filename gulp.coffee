@@ -27,8 +27,7 @@ sourcemaps      = require 'gulp-sourcemaps'
 watch           = require 'gulp-watch'
 gutil           = require 'gulp-util'
 modRewrite      = require 'connect-modrewrite'
-Notification    = require 'node-notifier'
-notifier        = new Notification()
+notification    = require 'node-notifier'
 exec            = require('child_process').exec
 Q               = require 'q'
 
@@ -251,7 +250,7 @@ gulp.task "test", ['webdriver_update', 'testBrowser'], (cb) ->
 
 reportError = (err) ->
   gutil.beep()
-  notifier.notify
+  notification.notify
     title: "Error running Gulp"
     message: err.message
   gutil.log err.message
