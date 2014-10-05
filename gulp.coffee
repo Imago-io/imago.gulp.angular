@@ -241,7 +241,7 @@ gulp.task "testBrowser", ->
     root: "#{dest}"
     fallback: "#{dest}/index.html"
 
-gulp.task "test", ['testBrowser'], (cb) ->
+gulp.task "test", ['webdriver_update', 'testBrowser'], (cb) ->
   gulp.src(config.paths.tests)
     .pipe protractor
       configFile: "tests/protractor.config.js"
