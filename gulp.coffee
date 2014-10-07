@@ -161,8 +161,6 @@ gulp.task "browser-sync", ->
       ghostMode: syncBrowsers
 
 
-
-
 gulp.task "watch", ["prepare", "browser-sync"], ->
   watch
     glob: "css/*.sass", emitOnGlob: false
@@ -199,7 +197,8 @@ gulp.task "watch", ["prepare", "browser-sync"], ->
 
 minify = ->
   gulp.src "#{dest}/#{config.targets.js}"
-    .pipe uglify()
+    .pipe uglify
+      mangle: false
     .pipe gulp.dest dest
 
 gulp.task "build", ['prepare'], minify
