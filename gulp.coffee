@@ -205,7 +205,7 @@ minify = ->
 gulp.task "build", ['prepare'], minify
 
 gulp.task "deploy", ["build"], ->
-  exec "deploy .", (error, stdout, stderr) ->
+  exec "deploy2 .", (error, stdout, stderr) ->
     console.log "result: " + stdout
     console.log "exec error: " + error  if error isnt null
 
