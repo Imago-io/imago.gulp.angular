@@ -141,8 +141,7 @@ gulp.task "combine", combineJs
 gulp.task "js", ["scripts", "coffee", "jade"], (next) ->
   next()
 
-gulp.task "prepare", ["js"], ->
-  generateSass()
+gulp.task "prepare", ["sass", "js"], ->
   combineJs()
 
 gulp.task "b", ["build"]
