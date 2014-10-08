@@ -12,6 +12,8 @@ gulp            = require 'gulp'
 jade            = require 'gulp-jade'
 
 ngClassify      = require 'gulp-ng-classify'
+
+karma           = require('karma').server
 protractor      = require('gulp-protractor').protractor
 webdriver_standalone = require('gulp-protractor').webdriver_standalone
 webdriver_update= require('gulp-protractor').webdriver_update
@@ -29,6 +31,8 @@ gutil           = require 'gulp-util'
 modRewrite      = require 'connect-modrewrite'
 notification    = require 'node-notifier'
 exec            = require('child_process').exec
+fs              = require 'fs'
+rimraf          = require 'rimraf'
 Q               = require 'q'
 
 
@@ -41,6 +45,8 @@ updateNotifier({packageName: pkg.name, packageVersion: pkg.version}).notify()
 
 dest = config.dest
 src  = config.src
+tests = config.tests
+tempTests = config.tempTests
 
 syncBrowsers = (if typeof config.browserSync then config.browserSync else true)
 
@@ -228,6 +234,69 @@ gulp.task "update", ['npm', 'bower'], ->
   gulp.src('bower_components/imago.widgets.angular/**/fonts/*.*')
     .pipe(flatten())
     .pipe(gulp.dest('public/i/fonts'))
+
+
+# Tests
+
+gulp.task "karma", ->
+
+  try
+    fs.statSync(tempTests)
+  catch e
+    if e.code is 'ENOENT'
+      fs.mkdirSync(tempTests)
+
+  YOUR_LOCALS = {}
+  gulp.src config.paths.coffee
+    .pipe plumber(
+      errorHandler: reportError
+    )
+    .pipe ngClassify(
+      appName: 'imago.widgets.angular'
+      animation:
+        format: 'camelCase'
+        prefix: ''
+      constant:
+        format: 'camelCase'
+        prefix: ''
+      controller:
+        format: 'camelCase'
+        suffix: ''
+      factory:
+        format: 'camelCase'
+      filter:
+        format: 'camelCase'
+      provider:
+        format: 'camelCase'
+        suffix: ''
+      service:
+        format: 'camelCase'
+        suffix: ''
+      value:
+        format: 'camelCase'
+      )
+    .pipe coffee(
+      bare: true
+    ).on('error', reportError)
+    .pipe gulp.dest tempTests
+  gulp.src config.paths.jade
+    .pipe plumber(
+      errorHandler: reportError
+    )
+    .pipe jade({locals: YOUR_LOCALS}).on('error', reportError)
+    .pipe templateCache(
+      standalone: true
+      root: "/imagoWidgets/"
+      module: "ImagoWidgetsTemplates"
+    )
+    .pipe concat config.targets.jade
+    .pipe gulp.dest tempTests
+  karma.start(
+    configFile: "#{tests}/karma.conf.coffee"
+    singleRun: true
+    )
+  console.log 'passed'
+  # rimraf(tempTests)
 
 gulp.task "webdriver_update", webdriver_update
 
