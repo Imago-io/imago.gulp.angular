@@ -169,7 +169,7 @@ gulp.task "browser-sync", ->
 
 gulp.task "watch", ["prepare", "browser-sync"], ->
   watch
-    glob: "css/*.sass", emitOnGlob: false
+    glob: ["css/*.sass", "#{src}/**/*.sass"], emitOnGlob: false
   , ->
     gulp.start('sass')
 
