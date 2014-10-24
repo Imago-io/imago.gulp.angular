@@ -49,6 +49,7 @@ tests = config.tests
 tempTests = config.tempTests
 
 syncBrowsers = (if typeof config.browserSync then config.browserSync else true)
+fonts = (if config.targets.fonts then "#{dest}/#{config.targets.fonts}" else "#{dest}/i/fonts")
 
 generateSass = () ->
   gulp.src config.paths.sass
@@ -135,12 +136,18 @@ combineJs = (production = false) ->
 
   sources = files.map (file) -> "#{dest}/#{file}"
 
-  gulp.src sources
-    .pipe sourcemaps.init()
-    .pipe concat config.targets.js
-    .pipe sourcemaps.write './maps'
-    .pipe gulp.dest dest
-    .pipe browserSync.reload(stream:true)
+  unless production
+    gulp.src sources
+      .pipe sourcemaps.init()
+      .pipe concat config.targets.js
+      .pipe sourcemaps.write './maps'
+      .pipe gulp.dest dest
+      .pipe browserSync.reload(stream:true)
+
+  else
+    gulp.src sources
+      .pipe concat config.targets.js
+      .pipe gulp.dest dest
 
 
 gulp.task "combine", combineJs
@@ -234,7 +241,7 @@ gulp.task "npm", ->
 gulp.task "update", ['npm', 'bower'], ->
   gulp.src('bower_components/imago.widgets.angular/**/fonts/*.*')
     .pipe(flatten())
-    .pipe(gulp.dest('public/i/fonts'))
+    .pipe(gulp.dest(fonts))
 
 
 # Tests
