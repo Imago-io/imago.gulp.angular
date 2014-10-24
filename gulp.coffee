@@ -49,7 +49,6 @@ tests = config.tests
 tempTests = config.tempTests
 
 syncBrowsers = (if typeof config.browserSync then config.browserSync else true)
-fonts = (if config.targets.fonts then config.targets.fonts else 'public/i/fonts')
 
 generateSass = () ->
   gulp.src config.paths.sass
@@ -169,7 +168,7 @@ gulp.task "browser-sync", ->
       ghostMode: syncBrowsers
 
 
-gulp.task "watch", ["precompile", "browser-sync"], ->
+gulp.task "watch", ["production", "browser-sync"], ->
   watch
     glob: ["css/*.sass", "#{src}/**/*.sass"], emitOnGlob: false
   , ->
@@ -235,7 +234,7 @@ gulp.task "npm", ->
 gulp.task "update", ['npm', 'bower'], ->
   gulp.src('bower_components/imago.widgets.angular/**/fonts/*.*')
     .pipe(flatten())
-    .pipe(gulp.dest(fonts))
+    .pipe(gulp.dest('public/i/fonts'))
 
 
 # Tests
