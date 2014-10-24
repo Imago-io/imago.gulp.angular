@@ -49,6 +49,7 @@ tests = config.tests
 tempTests = config.tempTests
 
 syncBrowsers = (if typeof config.browserSync then config.browserSync else true)
+fonts = (if config.targets.fonts then config.targets.fonts else 'public/i/fonts')
 
 generateSass = () ->
   gulp.src config.paths.sass
@@ -142,18 +143,19 @@ combineJs = (production = false) ->
     .pipe gulp.dest dest
     .pipe browserSync.reload(stream:true)
 
+
 gulp.task "combine", combineJs
 
 gulp.task "js", ["scripts", "coffee", "jade"], (next) ->
   next()
 
-gulp.task "prepare", ["sass", "js"], ->
+gulp.task "precompile", ["sass", "js"], ->
   combineJs()
 
+gulp.task "production", ["sass", "js"], ->
+  combineJs(true)
+
 gulp.task "b", ["build"]
-
-
-## Essentials Task
 
 gulp.task "browser-sync", ->
     browserSync.init ["#{dest}/index.html"],
@@ -167,7 +169,7 @@ gulp.task "browser-sync", ->
       ghostMode: syncBrowsers
 
 
-gulp.task "watch", ["prepare", "browser-sync"], ->
+gulp.task "watch", ["precompile", "browser-sync"], ->
   watch
     glob: ["css/*.sass", "#{src}/**/*.sass"], emitOnGlob: false
   , ->
@@ -207,7 +209,7 @@ minify = ->
       mangle: false
     .pipe gulp.dest dest
 
-gulp.task "build", ['prepare'], minify
+gulp.task "build", ['precompile'], minify
 
 gulp.task "deploy", ["build"], ->
   exec "deploy2 .", (error, stdout, stderr) ->
@@ -233,7 +235,7 @@ gulp.task "npm", ->
 gulp.task "update", ['npm', 'bower'], ->
   gulp.src('bower_components/imago.widgets.angular/**/fonts/*.*')
     .pipe(flatten())
-    .pipe(gulp.dest('public/i/fonts'))
+    .pipe(gulp.dest(fonts))
 
 
 # Tests
