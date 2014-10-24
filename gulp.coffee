@@ -136,18 +136,18 @@ combineJs = (production = false) ->
 
   sources = files.map (file) -> "#{dest}/#{file}"
 
-  if production
-    gulp.src sources
-      .pipe concat config.targets.js
-      .pipe gulp.dest dest
+  # if production
+  #   gulp.src sources
+  #     .pipe concat config.targets.js
+  #     .pipe gulp.dest dest
 
-  else
-    gulp.src sources
-      .pipe sourcemaps.init()
-      .pipe concat config.targets.js
-      .pipe sourcemaps.write './maps'
-      .pipe gulp.dest dest
-      .pipe browserSync.reload(stream:true)
+  # else
+  gulp.src sources
+    .pipe sourcemaps.init()
+    .pipe concat config.targets.js
+    .pipe sourcemaps.write './maps'
+    .pipe gulp.dest dest
+    .pipe browserSync.reload(stream:true)
 
 gulp.task "combine", combineJs
 
