@@ -168,7 +168,7 @@ gulp.task "browser-sync", ->
       ghostMode: syncBrowsers
 
 
-gulp.task "watch", ["production", "browser-sync"], ->
+gulp.task "watch", ["precompile", "browser-sync"], ->
   watch
     glob: ["css/*.sass", "#{src}/**/*.sass"], emitOnGlob: false
   , ->
@@ -208,7 +208,7 @@ minify = ->
       mangle: false
     .pipe gulp.dest dest
 
-gulp.task "build", ['precompile'], minify
+gulp.task "build", ['production'], minify
 
 gulp.task "deploy", ["build"], ->
   exec "deploy2 .", (error, stdout, stderr) ->
