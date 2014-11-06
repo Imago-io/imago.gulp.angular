@@ -174,7 +174,9 @@ gulp.task "browser-sync", ->
       ghostMode: syncBrowsers
 
 
-gulp.task "watch", ["precompile", "browser-sync"], ->
+gulp.task "watch", ["precompile"], ->
+  gulp.start('browser-sync')
+
   watch
     glob: ["css/*.sass", "#{src}/**/*.sass"], emitOnGlob: false
   , ->
