@@ -90,7 +90,7 @@ class Upload
 
   uploadFile: (filepath) ->
 
-    deferred = new defer();
+    deferred = new defer()
 
     uploadBinary = (body) =>
       stats = fs.statSync(filepath)
@@ -112,7 +112,7 @@ class Upload
       restler.post(url, {data : payload}).on('complete', uploadBinary)
 
     # post the request with the data and get the uploadurl
-    serving_path = filepath.split('/public')[1]
+    serving_path = filepath.split(@inpath)[1]
     mimetype     = mime.lookup serving_path
 
     filedata =
@@ -128,14 +128,8 @@ class Upload
 
     return deferred.promise
 
-class ThemeUpload
-
-  exec: (dest) ->
-
+module.exports = (dest) ->
     if fs.existsSync(dest) and fs.existsSync(dest)
       new Upload(dest)
     else
       console.log 'fuck'
-
-
-module.exports = ThemeUpload

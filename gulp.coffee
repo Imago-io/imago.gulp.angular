@@ -12,11 +12,8 @@ gulp            = require 'gulp'
 jade            = require 'gulp-jade'
 
 ngClassify      = require 'gulp-ng-classify'
-
-karma           = require('karma').server
-protractor      = require('gulp-protractor').protractor
 webdriver_standalone = require('gulp-protractor').webdriver_standalone
-webdriver_update= require('gulp-protractor').webdriver_update
+webdriver_update = require('gulp-protractor').webdriver_update
 
 plumber         = require 'gulp-plumber'
 prefix          = require 'gulp-autoprefixer'
@@ -27,42 +24,34 @@ templateCache   = require 'gulp-angular-templatecache'
 uglify          = require 'gulp-uglify'
 sourcemaps      = require 'gulp-sourcemaps'
 watch           = require 'gulp-watch'
-gutil           = require 'gulp-util'
 modRewrite      = require 'connect-modrewrite'
-notification    = require 'node-notifier'
 exec            = require('child_process').exec
-fs              = require 'fs'
 rimraf          = require 'rimraf'
 Q               = require 'q'
 
-
 updateNotifier  = require 'update-notifier'
 ThemeUpload     = require './themeupload'
+ThemeTests      = require './themetests'
+utils           = require './themeutils'
 pkg             = require './package.json'
 config          = require '../../gulp'
 
 updateNotifier({packageName: pkg.name, packageVersion: pkg.version}).notify()
 
-
-dest = config.dest
-src  = config.src
-tests = config.tests
-tempTests = config.tempTests
-
 syncBrowsers = (if typeof config.browserSync then config.browserSync else true)
-fonts = (if config.targets.fonts then "#{dest}/#{config.targets.fonts}" else "#{dest}/i/fonts")
+fonts = (if config.targets.fonts then "#{config.dest}/#{config.targets.fonts}" else "#{config.dest}/i/fonts")
 
 generateSass = () ->
   gulp.src config.paths.sass
     .pipe plumber
-      errorHandler: reportError
+      errorHandler: utils.reportError
     .pipe sassRuby
       quiet: true
       "sourcemap=none": true
     .pipe prefix("last 2 versions")
     .pipe concat config.targets.css
     .pipe plumber.stop()
-    .pipe gulp.dest dest
+    .pipe gulp.dest config.dest
     .pipe browserSync.reload(stream:true)
 
 gulp.task "sass", generateSass
@@ -70,7 +59,7 @@ gulp.task "sass", generateSass
 gulp.task "coffee", ->
   gulp.src config.paths.coffee
     .pipe plumber(
-      errorHandler: reportError
+      errorHandler: utils.reportError
     )
     .pipe ngClassify(
       animation:
@@ -97,36 +86,35 @@ gulp.task "coffee", ->
       )
     .pipe coffee(
       bare: true
-    ).on('error', reportError)
+    ).on('error', utils.reportError)
     .pipe coffeelint()
     .pipe concat config.targets.coffee
-    .pipe gulp.dest dest
+    .pipe gulp.dest config.dest
 
 gulp.task "jade", ->
-  YOUR_LOCALS = {}
   gulp.src config.paths.jade
     .pipe plumber(
-      errorHandler: reportError
+      errorHandler: utils.reportError
     )
-    .pipe jade({locals: YOUR_LOCALS}).on('error', reportError)
+    .pipe jade({locals: {}}).on('error', utils.reportError)
     .pipe templateCache(
       standalone: true
-      root: "/#{src}/"
+      root: "/#{config.src}/"
       module: "templatesApp"
     )
     .pipe concat config.targets.jade
-    .pipe gulp.dest dest
+    .pipe gulp.dest config.dest
 
 gulp.task "scripts", ->
   gulp.src config.paths.libs
     .pipe plumber(
-      errorHandler: reportError
+      errorHandler: utils.reportError
     )
     .pipe concat config.targets.scripts
-    .pipe gulp.dest dest
+    .pipe gulp.dest config.dest
 
 
-combineJs = (production = false) ->
+combineJs = ->
 
   rethrow = (err, filename, lineno) -> throw err
 
@@ -136,19 +124,13 @@ combineJs = (production = false) ->
     config.targets.jade
   ]
 
-  sources = files.map (file) -> "#{dest}/#{file}"
+  sources = files.map (file) -> "#{config.dest}/#{file}"
 
-  # if production
-  #   gulp.src sources
-  #     .pipe concat config.targets.js
-  #     .pipe gulp.dest dest
-
-  # else
   gulp.src sources
     .pipe sourcemaps.init()
     .pipe concat config.targets.js
-    .pipe sourcemaps.write './maps'
-    .pipe gulp.dest dest
+    .pipe sourcemaps.write "#{dest}/maps"
+    .pipe gulp.dest config.dest
     .pipe browserSync.reload(stream:true)
 
 gulp.task "combine", combineJs
@@ -162,12 +144,10 @@ gulp.task "precompile", ["sass", "js"], ->
 gulp.task "production", ["sass", "js"], ->
   combineJs(true)
 
-gulp.task "b", ["build"]
-
 gulp.task "browser-sync", ->
-    browserSync.init ["#{dest}/index.html"],
+    browserSync.init ["#{config.dest}/index.html"],
       server:
-        baseDir: "#{dest}"
+        baseDir: "#{config.dest}"
         middleware: [
           modRewrite ['^([^.]+)$ /index.html [L]']
         ]
@@ -179,7 +159,7 @@ gulp.task "browser-sync", ->
 gulp.task "watch", ["precompile"], ->
   gulp.start('browser-sync')
   watch
-    glob: ["css/*.sass", "#{src}/**/*.sass"], emitOnGlob: false
+    glob: ["css/*.sass", "#{config.src}/**/*.sass"], emitOnGlob: false
   , ->
     gulp.start('sass')
 
@@ -204,7 +184,7 @@ gulp.task "watch", ["precompile"], ->
     gulp.start('coffee')
 
   files = [config.targets.scripts, config.targets.jade, config.targets.coffee]
-  sources = ("#{dest}/#{file}" for file in files)
+  sources = ("#{config.dest}/#{file}" for file in files)
 
   watch
     glob: sources, emitOnGlob: false
@@ -212,22 +192,21 @@ gulp.task "watch", ["precompile"], ->
     gulp.start('combine')
 
 minify = ->
-  gulp.src "#{dest}/#{config.targets.js}"
+  gulp.src "#{config.dest}/#{config.targets.js}"
     .pipe uglify
       mangle: false
-    .pipe gulp.dest dest
+    .pipe gulp.dest config.dest
 
 gulp.task "build", ['production'], minify
 
 gulp.task "deploy", ['build'], ->
-  themeupload = new ThemeUpload
-  themeupload.exec(dest)
+  ThemeUpload(config.dest)
 
 gulp.task "bower", ->
   deferred = Q.defer()
   exec "bower update", (error, stdout, stderr) ->
     console.log "result: " + stdout
-    console.log "exec error: " + error  if error isnt null
+    console.log "exec error: " + error if error isnt null
     deferred.resolve()
   return deferred.promise
 
@@ -235,7 +214,7 @@ gulp.task "npm", ->
   deferred = Q.defer()
   exec "npm update", (error, stdout, stderr) ->
     console.log "result: " + stdout
-    console.log "exec error: " + error  if error isnt null
+    console.log "exec error: " + error if error isnt null
     deferred.resolve()
   return deferred.promise
 
@@ -247,92 +226,22 @@ gulp.task "update", ['npm', 'bower'], ->
 
 # Tests
 
-gulp.task "karma", ->
-
-  try
-    fs.statSync(tempTests)
-  catch e
-    if e.code is 'ENOENT'
-      fs.mkdirSync(tempTests)
-
-  YOUR_LOCALS = {}
-  gulp.src config.paths.coffee
-    .pipe plumber(
-      errorHandler: reportError
-    )
-    .pipe ngClassify(
-      appName: 'imago.widgets.angular'
-      animation:
-        format: 'camelCase'
-        prefix: ''
-      constant:
-        format: 'camelCase'
-        prefix: ''
-      controller:
-        format: 'camelCase'
-        suffix: ''
-      factory:
-        format: 'camelCase'
-      filter:
-        format: 'camelCase'
-      provider:
-        format: 'camelCase'
-        suffix: ''
-      service:
-        format: 'camelCase'
-        suffix: ''
-      value:
-        format: 'camelCase'
-      )
-    .pipe coffee(
-      bare: true
-    ).on('error', reportError)
-    .pipe gulp.dest tempTests
-  gulp.src config.paths.jade
-    .pipe plumber(
-      errorHandler: reportError
-    )
-    .pipe jade({locals: YOUR_LOCALS}).on('error', reportError)
-    .pipe templateCache(
-      standalone: true
-      root: "/imagoWidgets/"
-      module: "ImagoWidgetsTemplates"
-    )
-    .pipe concat config.targets.jade
-    .pipe gulp.dest tempTests
-  karma.start(
-    configFile: "#{tests}/karma.conf.coffee"
-    singleRun: true
-    )
-  console.log 'passed'
-  # rimraf(tempTests)
+gulp.task "testBrowser", ->
+  connect.server
+    root: "#{config.dest}"
+    fallback: "#{config.dest}/index.html"
 
 gulp.task "webdriver_update", webdriver_update
 
 gulp.task "webdriver_standalone", webdriver_standalone
 
-gulp.task "testBrowser", ->
-  connect.server
-    root: "#{dest}"
-    fallback: "#{dest}/index.html"
-
 gulp.task "test", ['webdriver_update', 'testBrowser'], (cb) ->
-  gulp.src(config.paths.tests)
-    .pipe protractor
-      configFile: "tests/protractor.config.js"
-    .on "error", reportError
-    .on "end", () ->
-      connect.serverClose()
+  ThemeTests.protractor(config)
 
-reportError = (err) ->
-  gutil.beep()
-  notification.notify
-    title: "Error running Gulp"
-    message: err.message
-  gutil.log err.message
-  @emit 'end'
+gulp.task "karma", ->
+  ThemeTests.karma(config)
 
-## End essentials tasks
+# End Tests
 
 gulp.task "default", ["watch"]
 
