@@ -58,6 +58,7 @@ generateSass = () ->
       errorHandler: reportError
     .pipe sassRuby
       quiet: true
+      "sourcemap=none": true
     .pipe prefix("last 2 versions")
     .pipe concat config.targets.css
     .pipe plumber.stop()
