@@ -129,7 +129,7 @@ combineJs = ->
   gulp.src sources
     .pipe sourcemaps.init()
     .pipe concat config.targets.js
-    .pipe sourcemaps.write "#{dest}/maps"
+    .pipe sourcemaps.write "#{config.dest}/maps"
     .pipe gulp.dest config.dest
     .pipe browserSync.reload(stream:true)
 
