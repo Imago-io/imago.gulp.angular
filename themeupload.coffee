@@ -1,13 +1,10 @@
-fs      = require("fs")
-restler = require("restler")
-walk    = require("walkdir")
-YAML    = require("libyaml")
-mime    = require("mime")
+fs      = require 'fs'
+restler = require 'restler'
+walk    = require 'walkdir'
+YAML    = require 'libyaml'
+mime    = require 'mime'
 hash    = require("mhash").hash
-
-defer = require("node-promise").defer
-promisewhen = require("node-promise").when
-promiseall = require("node-promise").all
+Q       = require 'q'
 
 class Upload
 
@@ -70,7 +67,9 @@ class Upload
     @callcounter = @totalfiles
     console.log 'starting deployment for', @totalfiles, 'files'
     objs = (@uploadFile filepath for filepath in paths)
-    promisewhen promiseall(objs), @cleanup
+    # promisewhen promiseall(objs), @cleanup
+    Q.all(objs).then (resolved) =>
+      @cleanup()
 
   flushCache: =>
     console.log 'flushing the cache'
@@ -90,7 +89,7 @@ class Upload
 
   uploadFile: (filepath) ->
 
-    deferred = new defer()
+    deferred = Q.defer()
 
     uploadBinary = (body) =>
       stats = fs.statSync(filepath)
