@@ -200,23 +200,26 @@ minify = ->
 gulp.task "build", ['production'], minify
 
 gulp.task "deploy", ['build'], ->
-  ThemeUpload(config.dest)
+  defer = Q.defer()
+  ThemeUpload(config.dest).then ->
+    defer.resolve()
+  defer.promise
 
 gulp.task "bower", ->
-  deferred = Q.defer()
+  defer = Q.defer()
   exec "bower update", (error, stdout, stderr) ->
     console.log "result: " + stdout
     console.log "exec error: " + error if error isnt null
-    deferred.resolve()
-  return deferred.promise
+    defer.resolve()
+  return defer.promise
 
 gulp.task "npm", ->
-  deferred = Q.defer()
+  defer = Q.defer()
   exec "npm update", (error, stdout, stderr) ->
     console.log "result: " + stdout
     console.log "exec error: " + error if error isnt null
-    deferred.resolve()
-  return deferred.promise
+    defer.resolve()
+  return defer.promise
 
 gulp.task "update", ['npm', 'bower'], ->
   gulp.src('bower_components/imago.widgets.angular/**/fonts/*.*')

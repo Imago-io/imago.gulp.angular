@@ -8,7 +8,7 @@ Q       = require 'q'
 
 class Upload
 
-  constructor: (inpath) ->
+  constructor: (inpath, @cb) ->
 
     @inpath      = inpath
     @opts        = {}
@@ -76,7 +76,10 @@ class Upload
     data =
       data : {key: 'UWSMJGaPRcAmgXbNjOhHYrT2VzIkufKqy9eptsExCQnFD'}
     url = @domain + '/themeupload/flushcache'
-    restler.post(url, data).on('complete', (data, response) -> console.log('deployment done!'))
+    restler.post(url, data).on('complete', (data, response) =>
+      console.log('deployment done!')
+      @cb()
+    )
 
   cleanup: =>
     console.log 'done uploading files...'
@@ -89,7 +92,7 @@ class Upload
 
   uploadFile: (filepath) ->
 
-    deferred = Q.defer()
+    defer = Q.defer()
 
     uploadBinary = (body) =>
       stats = fs.statSync(filepath)
@@ -100,7 +103,7 @@ class Upload
       console.log 'uploading ->', serving_path
 
       restler.post(body, data).on('complete', (data, response) =>
-          deferred.resolve()
+          defer.resolve()
         )
 
 
@@ -125,10 +128,16 @@ class Upload
 
       postData filedata
 
-    return deferred.promise
+    return defer.promise
 
 module.exports = (dest) ->
-    if fs.existsSync(dest) and fs.existsSync(dest)
-      new Upload(dest)
-    else
-      console.log 'fuck'
+  defer = Q.defer()
+
+  if fs.existsSync(dest) and fs.existsSync(dest)
+    new Upload(dest, -> defer.resolve())
+
+  else
+    defer.resolve()
+    console.log 'fuck'
+
+  defer.promise
