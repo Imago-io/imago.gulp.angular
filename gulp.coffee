@@ -37,6 +37,7 @@ Q               = require 'q'
 
 
 updateNotifier  = require 'update-notifier'
+ThemeUpload     = require './themeupload'
 pkg             = require './package.json'
 config          = require '../../gulp'
 
@@ -57,7 +58,6 @@ generateSass = () ->
       errorHandler: reportError
     .pipe sassRuby
       quiet: true
-      "sourcemap=none": true
     .pipe prefix("last 2 versions")
     .pipe concat config.targets.css
     .pipe plumber.stop()
@@ -175,9 +175,7 @@ gulp.task "browser-sync", ->
       ghostMode: syncBrowsers
 
 
-gulp.task "watch", ["precompile"], ->
-  gulp.start('browser-sync')
-
+gulp.task "watch", ["precompile", "browser-sync"], ->
   watch
     glob: ["css/*.sass", "#{src}/**/*.sass"], emitOnGlob: false
   , ->
@@ -219,10 +217,9 @@ minify = ->
 
 gulp.task "build", ['production'], minify
 
-gulp.task "deploy", ["build"], ->
-  exec "deploy2 .", (error, stdout, stderr) ->
-    console.log "result: " + stdout
-    console.log "exec error: " + error  if error isnt null
+gulp.task "deploy", ['build'], ->
+  themeupload = new ThemeUpload
+  themeupload.exec(dest)
 
 gulp.task "bower", ->
   deferred = Q.defer()
@@ -336,6 +333,3 @@ reportError = (err) ->
 ## End essentials tasks
 
 gulp.task "default", ["watch"]
-
-
-module.exports = gulp
