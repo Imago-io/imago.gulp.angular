@@ -22,6 +22,7 @@ sassRuby        = require 'gulp-ruby-sass'
 templateCache   = require 'gulp-angular-templatecache'
 
 uglify          = require 'gulp-uglify'
+rename          = require 'gulp-rename'
 sourcemaps      = require 'gulp-sourcemaps'
 watch           = require 'gulp-watch'
 modRewrite      = require 'connect-modrewrite'
@@ -195,6 +196,7 @@ minify = ->
   gulp.src "#{config.dest}/#{config.targets.js}"
     .pipe uglify
       mangle: false
+    .pipe rename(config.targets.jsMin)
     .pipe gulp.dest config.dest
 
 gulp.task "build", ['production'], minify
