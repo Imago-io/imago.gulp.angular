@@ -12,7 +12,7 @@ class Upload
 
     @inpath      = inpath
     @opts        = {}
-    @exclude     = ['theme.yaml', 'index.html']
+    @exclude     = ['theme.yaml', 'index.html', 'coffee.js', 'scripts.js', 'application.js']
     @domain      = ''
     @version     = null
     @totalfiles  = 0
@@ -138,6 +138,6 @@ module.exports = (dest) ->
 
   else
     defer.resolve()
-    console.log 'fuck'
+    console.log 'something went wrong'
 
   defer.promise
