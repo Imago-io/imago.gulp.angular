@@ -175,7 +175,7 @@ gulp.task "watch", ["precompile"], ->
     gulp.start('jade')
 
   watch
-    glob: "bower_components/imago.widgets.angular/dist/imago.widgets.angular.js", emitOnGlob: false
+    glob: 'bower_components/imago/dist/**/*.*', emitOnGlob: false
   , ->
     gulp.start('scripts')
 
