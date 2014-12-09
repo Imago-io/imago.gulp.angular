@@ -3,7 +3,7 @@ restler = require 'restler'
 walk    = require 'walkdir'
 YAML    = require 'libyaml'
 mime    = require 'mime'
-hash    = require("mhash").hash
+hash    = require 'mhash'
 Q       = require 'q'
 
 class Upload

@@ -42,7 +42,7 @@
     "karma-requirejs": "^0.2.2",
     "karma-safari-launcher": "^0.1.1",
     "libyaml": "*",
-    "mhash": "*",
+    "mhash": "^1.1.0",
     "mime": "*",
     "node-notifier": "*",
     "protractor": "^1.3.1",
