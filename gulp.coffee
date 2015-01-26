@@ -42,13 +42,10 @@ updateNotifier({packageName: pkg.name, packageVersion: pkg.version}).notify()
 syncBrowsers = (if typeof config.browserSync then config.browserSync else true)
 fonts = (if config.targets.fonts then "#{config.dest}/#{config.targets.fonts}" else "#{config.dest}/i/fonts")
 
-generateSass = () ->
-  gulp.src config.paths.sass
+generateSass = ->
+  return sassRuby(config.paths.sass, quiet: true)
     .pipe plumber
       errorHandler: utils.reportError
-    .pipe sassRuby
-      quiet: true
-      "sourcemap=none": true
     .pipe prefix("last 2 versions")
     .pipe concat config.targets.css
     .pipe plumber.stop()
