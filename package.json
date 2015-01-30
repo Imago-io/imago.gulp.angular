@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "browser-sync": "1.5.1",
-    "coffee-script": "*",
+    "coffee-script": "1.8.0",
     "connect-modrewrite": "*",
     "deep-extend": "*",
     "gulp-angular-templatecache": "*",
