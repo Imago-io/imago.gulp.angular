@@ -10,8 +10,8 @@
     "name": "Nex9 LLC"
   },
   "dependencies": {
-    "browser-sync": "1.5.1",
-    "coffee-script": "1.8.0",
+    "browser-sync": "~1",
+    "coffee-script": "~1",
     "connect-modrewrite": "*",
     "deep-extend": "*",
     "gulp-angular-templatecache": "*",
