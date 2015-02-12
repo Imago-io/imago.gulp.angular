@@ -10,7 +10,7 @@
     "name": "Nex9 LLC"
   },
   "dependencies": {
-    "browser-sync": "~1",
+    "browser-sync": "~2",
     "coffee-script": "~1",
     "connect-modrewrite": "*",
     "deep-extend": "*",
