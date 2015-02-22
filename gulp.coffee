@@ -151,7 +151,6 @@ gulp.task "browser-sync", ->
         ]
       debugInfo: false
       notify: false
-      ghostMode: syncBrowsers
 
 
 gulp.task "watch", ["precompile"], ->
