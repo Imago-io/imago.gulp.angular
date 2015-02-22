@@ -43,7 +43,20 @@ syncBrowsers = (if typeof config.browserSync then config.browserSync else true)
 fonts = (if config.targets.fonts then "#{config.dest}/#{config.targets.fonts}" else "#{config.dest}/i/fonts")
 
 generateSass = ->
-  return sassRuby(config.paths.sass, quiet: true)
+  return sassRuby(config.paths.sass, quiet: true, sourcemap: true)
+    .pipe plumber
+      errorHandler: utils.reportError
+    .pipe prefix("last 2 versions")
+    .pipe concat config.targets.css
+    .pipe sourcemaps.write()
+    .pipe plumber.stop()
+    .pipe gulp.dest config.dest
+    .pipe browserSync.reload(stream:true)
+
+gulp.task "sass", generateSass
+
+gulp.task "sassProduction", ->
+  return sassRuby(config.paths.sass, quiet: true, style: 'compressed')
     .pipe plumber
       errorHandler: utils.reportError
     .pipe prefix("last 2 versions")
@@ -51,8 +64,6 @@ generateSass = ->
     .pipe plumber.stop()
     .pipe gulp.dest config.dest
     .pipe browserSync.reload(stream:true)
-
-gulp.task "sass", generateSass
 
 gulp.task "coffee", ->
   gulp.src config.paths.coffee
@@ -139,7 +150,7 @@ gulp.task "js", ["scripts", "coffee", "jade"], (next) ->
 gulp.task "precompile", ["sass", "js"], ->
   combineJs()
 
-gulp.task "production", ["sass", "js"], ->
+gulp.task "production", ["sassProduction", "js"], ->
   combineJs(true)
 
 gulp.task "browser-sync", ->
@@ -151,6 +162,7 @@ gulp.task "browser-sync", ->
         ]
       debugInfo: false
       notify: false
+      ghostMode: syncBrowsers
 
 
 gulp.task "watch", ["precompile"], ->
