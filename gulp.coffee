@@ -60,7 +60,7 @@ gulp.task "sassProduction", ->
     .pipe plumber
       errorHandler: utils.reportError
     .pipe prefix("last 2 versions")
-    .pipe concat config.targets.css
+    .pipe concat config.targets.cssMin
     .pipe plumber.stop()
     .pipe gulp.dest config.dest
     .pipe browserSync.reload(stream:true)
