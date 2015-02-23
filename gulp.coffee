@@ -154,6 +154,7 @@ gulp.task "production", ["sassProduction", "js"], ->
   combineJs(true)
 
 gulp.task "browser-sync", ->
+  if syncBrowsers
     browserSync.init ["#{config.dest}/index.html"],
       server:
         baseDir: "#{config.dest}"
@@ -162,6 +163,16 @@ gulp.task "browser-sync", ->
         ]
       debugInfo: false
       notify: false
+  else
+    browserSync.init ["#{config.dest}/index.html"],
+      server:
+        baseDir: "#{config.dest}"
+        middleware: [
+          modRewrite ['^([^.]+)$ /index.html [L]']
+        ]
+      debugInfo: false
+      notify: false
+      ghostMode: false
 
 
 gulp.task "watch", ["precompile"], ->
