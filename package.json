@@ -55,7 +55,7 @@
   "private": true,
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@git.nex9.com/repo/imago.gulp.angular"
+    "url": "git@github.com:Nex9/imago.gulp.angular.git"
   },
   "readme": "Imago Angular",
   "_id": "imago-gulp-angular@0.0.4",
