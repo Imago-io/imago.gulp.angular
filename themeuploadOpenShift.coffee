@@ -1,11 +1,12 @@
-fs      = require("fs")
-restler = require("restler")
-walk    = require("walkdir")
-YAML    = require("libyaml")
-mime    = require("mime")
-md5     = require("MD5")
-pathMod = require("path")
-async   = require("async")
+fs      = require "fs"
+restler = require "restler"
+walk    = require "walkdir"
+YAML    = require "libyaml"
+mime    = require "mime"
+md5     = require "MD5"
+pathMod = require "path"
+async   = require "async"
+Q       = require "q"
 
 
 class Upload
