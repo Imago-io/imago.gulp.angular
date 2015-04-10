@@ -47,7 +47,7 @@ generateSass = ->
   return sassRuby(config.paths.sass, quiet: true, sourcemap: true)
     .pipe plumber
       errorHandler: utils.reportError
-    .pipe prefix("last 2 versions")
+    .pipe prefix("last 4 versions")
     .pipe concat config.targets.css
     .pipe sourcemaps.write()
     .pipe plumber.stop()
@@ -60,7 +60,7 @@ gulp.task "sassProduction", ->
   return sassRuby(config.paths.sass, quiet: true, style: 'compressed')
     .pipe plumber
       errorHandler: utils.reportError
-    .pipe prefix("last 2 versions")
+    .pipe prefix("last 4 versions")
     .pipe concat config.targets.cssMin
     .pipe plumber.stop()
     .pipe gulp.dest config.dest
