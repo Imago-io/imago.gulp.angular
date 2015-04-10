@@ -40,7 +40,8 @@ config          = require '../../gulp'
 updateNotifier({packageName: pkg.name, packageVersion: pkg.version}).notify()
 
 syncBrowsers = (if typeof config.browserSync then config.browserSync else true)
-fonts = (if config.targets.fonts then "#{config.dest}/#{config.targets.fonts}" else "#{config.dest}/i/fonts")
+fonts  = (if config.targets.fonts  then "#{config.dest}/#{config.targets.fonts}"  else "#{config.dest}/i/fonts")
+images = (if config.targets.images then "#{config.dest}/#{config.targets.images}" else "#{config.dest}/i")
 
 generateSass = ->
   return sassRuby(config.paths.sass, quiet: true, sourcemap: true)
@@ -245,6 +246,9 @@ gulp.task "update", ['npm', 'bower'], ->
   gulp.src('bower_components/imago/**/fonts/*.*')
     .pipe(flatten())
     .pipe(gulp.dest(fonts))
+  gulp.src('bower_components/imago/css/images/*.*')
+    .pipe(flatten())
+    .pipe(gulp.dest(images))
 
 
 # Tests
