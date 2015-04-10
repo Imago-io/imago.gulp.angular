@@ -242,7 +242,7 @@ gulp.task "npm", ->
   return defer.promise
 
 gulp.task "update", ['npm', 'bower'], ->
-  gulp.src('bower_components/imago.widgets.angular/**/fonts/*.*')
+  gulp.src('bower_components/imago/**/fonts/*.*')
     .pipe(flatten())
     .pipe(gulp.dest(fonts))
 
