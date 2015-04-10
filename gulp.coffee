@@ -32,6 +32,7 @@ Q               = require 'q'
 
 updateNotifier  = require 'update-notifier'
 ThemeUpload     = require './themeupload'
+ThemeUploadOS   = require './themeuploadOpenShift'
 ThemeTests      = require './themetests'
 utils           = require './themeutils'
 pkg             = require './package.json'
@@ -223,6 +224,12 @@ gulp.task "build", ['production'], minify
 gulp.task "deploy", ['build'], ->
   defer = Q.defer()
   ThemeUpload(config.dest).then ->
+    defer.resolve()
+  defer.promise
+
+gulp.task "deployOS", ['build'], ->
+  defer = Q.defer()
+  ThemeUploadOS(config.dest).then ->
     defer.resolve()
   defer.promise
 
