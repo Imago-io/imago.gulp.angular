@@ -38,6 +38,8 @@ utils           = require './themeutils'
 pkg             = require './package.json'
 config          = require '../../gulp'
 
+sketch          = require 'gulp-sketch'
+
 updateNotifier({packageName: pkg.name, packageVersion: pkg.version}).notify()
 
 syncBrowsers = (if typeof config.browserSync then config.browserSync else true)
@@ -116,6 +118,16 @@ gulp.task "jade", ->
     .pipe concat config.targets.jade
     .pipe gulp.dest config.dest
 
+gulp.task 'sketch', ->
+  console.log 'run sketch'
+  return unless config.paths.sketch
+  gulp.src config.paths.sketch
+    .pipe sketch(
+      export: 'artboards'
+      saveForWeb: true
+      trimmed: false)
+    .pipe gulp.dest "#{config.dest}/i"
+
 gulp.task "scripts", ->
   gulp.src config.paths.libs
     .pipe plumber(
@@ -149,7 +161,7 @@ gulp.task "combine", combineJs
 gulp.task "js", ["scripts", "coffee", "jade"], (next) ->
   next()
 
-gulp.task "precompile", ["sass", "js"], ->
+gulp.task "precompile", ["sass", "js", "sketch"], ->
   combineJs()
 
 gulp.task "production", ["sassProduction", "js"], ->
@@ -193,6 +205,11 @@ gulp.task "watch", ["precompile"], ->
     glob: config.paths.jade, emitOnGlob: false
   , ->
     gulp.start('jade')
+
+  watch
+    glob: config.paths.sketch, emitOnGlob: false
+  , ->
+    gulp.start('sketch')
 
   watch
     glob: 'bower_components/imago/dist/**/*.*', emitOnGlob: false
