@@ -119,8 +119,6 @@ gulp.task "jade", ->
     .pipe gulp.dest config.dest
 
 gulp.task 'sketch', ->
-  console.log 'run sketch'
-  return unless config.paths.sketch
   gulp.src config.paths.sketch
     .pipe sketch(
       export: 'artboards'
@@ -164,7 +162,7 @@ gulp.task "js", ["scripts", "coffee", "jade"], (next) ->
 gulp.task "precompile", ["sass", "js", "sketch"], ->
   combineJs()
 
-gulp.task "production", ["sassProduction", "js"], ->
+gulp.task "production", ["sassProduction", "js", "sketch"], ->
   combineJs(true)
 
 gulp.task "browser-sync", ->
