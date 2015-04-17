@@ -119,6 +119,7 @@ gulp.task "jade", ->
     .pipe gulp.dest config.dest
 
 gulp.task 'sketch', ->
+  return unless config.paths.sketch
   gulp.src config.paths.sketch
     .pipe sketch(
       export: 'artboards'
