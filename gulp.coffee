@@ -237,13 +237,13 @@ minify = ->
 
 gulp.task "build", ['production'], minify
 
-gulp.task "deploy", ['build'], ->
+gulp.task "deployGae", ['build'], ->
   defer = Q.defer()
   ThemeUpload(config.dest).then ->
     defer.resolve()
   defer.promise
 
-gulp.task "deployOS", ['build'], ->
+gulp.task "deploy", ['build'], ->
   defer = Q.defer()
   ThemeUploadOS(config.dest).then ->
     defer.resolve()
