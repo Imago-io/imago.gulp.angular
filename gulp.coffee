@@ -155,6 +155,18 @@ combineJs = ->
     .pipe gulp.dest config.dest
     .pipe browserSync.reload(stream:true)
 
+
+gulp.task "index", ->
+  gulp.src config.paths.index
+    .pipe plumber(
+      errorHandler: utils.reportError
+    )
+    .pipe jade(
+      locals: {}
+      pretty: true
+      ).on('error', utils.reportError)
+    .pipe gulp.dest config.dest
+
 gulp.task "combine", combineJs
 
 gulp.task "js", ["scripts", "coffee", "jade"], (next) ->
@@ -190,6 +202,11 @@ gulp.task "browser-sync", ->
 
 gulp.task "watch", ["precompile"], ->
   gulp.start('browser-sync')
+  watch
+    glob: config.paths.index, emitOnGlob: false
+  , ->
+    gulp.start('index')
+
   watch
     glob: ["css/*.sass", "#{config.src}/**/*.sass"], emitOnGlob: false
   , ->
