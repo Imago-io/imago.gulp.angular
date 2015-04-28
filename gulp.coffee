@@ -172,7 +172,7 @@ gulp.task "combine", combineJs
 gulp.task "js", ["scripts", "coffee", "jade"], (next) ->
   next()
 
-gulp.task "precompile", ["sass", "js", "sketch"], ->
+gulp.task "precompile", ["index", "sass", "js", "sketch"], ->
   combineJs()
 
 gulp.task "production", ["sassProduction", "js", "sketch"], ->
