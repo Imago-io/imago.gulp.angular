@@ -121,6 +121,9 @@ gulp.task "jade", ->
 gulp.task 'sketch', ->
   return unless config.paths.sketch
   gulp.src config.paths.sketch
+    .pipe plumber(
+      errorHandler: utils.reportError
+    )
     .pipe sketch(
       export: 'artboards'
       saveForWeb: true
@@ -314,3 +317,4 @@ gulp.task "karma", ->
 gulp.task "default", ["watch"]
 
 module.exports = gulp
+g
