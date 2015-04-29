@@ -317,4 +317,3 @@ gulp.task "karma", ->
 gulp.task "default", ["watch"]
 
 module.exports = gulp
-g
