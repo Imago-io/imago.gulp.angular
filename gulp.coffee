@@ -157,6 +157,7 @@ combineJs = ->
 
 
 gulp.task "index", ->
+  return unless config.paths.index
   gulp.src config.paths.index
     .pipe plumber(
       errorHandler: utils.reportError
