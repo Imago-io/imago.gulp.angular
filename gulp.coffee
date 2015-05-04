@@ -33,7 +33,7 @@ Q               = require 'q'
 updateNotifier  = require 'update-notifier'
 ThemeUpload     = require './themeupload'
 ThemeUploadOS   = require './themeuploadOpenShift'
-ThemeTests      = require './themetests'
+# ThemeTests      = require './themetests'
 utils           = require './themeutils'
 pkg             = require './package.json'
 config          = require '../../gulp'
@@ -297,20 +297,20 @@ gulp.task "update", ['npm', 'bower'], ->
 
 # Tests
 
-gulp.task "testBrowser", ->
-  connect.server
-    root: "#{config.dest}"
-    fallback: "#{config.dest}/index.html"
+# gulp.task "testBrowser", ->
+#   connect.server
+#     root: "#{config.dest}"
+#     fallback: "#{config.dest}/index.html"
 
-gulp.task "webdriver_update", webdriver_update
+# gulp.task "webdriver_update", webdriver_update
 
-gulp.task "webdriver_standalone", webdriver_standalone
+# gulp.task "webdriver_standalone", webdriver_standalone
 
-gulp.task "test", ['webdriver_update', 'testBrowser'], (cb) ->
-  ThemeTests.protractor(config)
+# gulp.task "test", ['webdriver_update', 'testBrowser'], (cb) ->
+#   ThemeTests.protractor(config)
 
-gulp.task "karma", ->
-  ThemeTests.karma(config)
+# gulp.task "karma", ->
+#   ThemeTests.karma(config)
 
 # End Tests
 
