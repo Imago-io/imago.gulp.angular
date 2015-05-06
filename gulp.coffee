@@ -12,8 +12,8 @@ gulp            = require 'gulp'
 jade            = require 'gulp-jade'
 
 ngClassify      = require 'gulp-ng-classify'
-webdriver_standalone = require('gulp-protractor').webdriver_standalone
-webdriver_update = require('gulp-protractor').webdriver_update
+# webdriver_standalone = require('gulp-protractor').webdriver_standalone
+# webdriver_update = require('gulp-protractor').webdriver_update
 
 plumber         = require 'gulp-plumber'
 prefix          = require 'gulp-autoprefixer'
