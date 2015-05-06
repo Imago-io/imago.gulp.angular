@@ -188,7 +188,7 @@ gulp.task "browser-sync", ->
       server:
         baseDir: "#{config.dest}"
         middleware: [
-          modRewrite ['!\\.\\w+$ /index.html [L]']
+          modRewrite ['^([^\\.]+)(\\?.+)?$ /index.html [L]']
         ]
       debugInfo: false
       notify: false
@@ -197,7 +197,7 @@ gulp.task "browser-sync", ->
       server:
         baseDir: "#{config.dest}"
         middleware: [
-          modRewrite ['^([^.]+)$ /index.html [L]']
+          modRewrite ['^([^\\.]+)(\\?.+)?$ /index.html [L]']
         ]
       debugInfo: false
       notify: false
