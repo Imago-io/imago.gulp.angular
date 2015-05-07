@@ -31,7 +31,7 @@ rimraf          = require 'rimraf'
 Q               = require 'q'
 
 updateNotifier  = require 'update-notifier'
-ThemeUpload     = require './themeupload'
+# ThemeUpload     = require './themeupload'
 ThemeUploadOS   = require './themeuploadOpenShift'
 # ThemeTests      = require './themetests'
 utils           = require './themeutils'
