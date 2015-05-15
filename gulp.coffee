@@ -17,8 +17,8 @@ ngClassify      = require 'gulp-ng-classify'
 
 plumber         = require 'gulp-plumber'
 prefix          = require 'gulp-autoprefixer'
-# sass            = require 'gulp-sass'
-sassRuby        = require 'gulp-ruby-sass'
+sass            = require 'gulp-sass'
+# sassRuby        = require 'gulp-ruby-sass'
 templateCache   = require 'gulp-angular-templatecache'
 
 uglify          = require 'gulp-uglify'
@@ -47,9 +47,11 @@ fonts  = (if config.targets.fonts  then "#{config.dest}/#{config.targets.fonts}"
 images = (if config.targets.images then "#{config.dest}/#{config.targets.images}" else "#{config.dest}/i")
 
 generateSass = ->
-  return sassRuby(config.paths.sass, quiet: true, sourcemap: true)
+  return gulp.src(config.paths.sass)
     .pipe plumber
       errorHandler: utils.reportError
+    .pipe sourcemaps.init()
+    .pipe sass({options: {'indentedSyntax': true, 'quiet': true}})
     .pipe prefix("last 4 versions")
     .pipe concat config.targets.css
     .pipe sourcemaps.write()
@@ -60,9 +62,11 @@ generateSass = ->
 gulp.task "sass", generateSass
 
 gulp.task "sassProduction", ->
-  return sassRuby(config.paths.sass, quiet: true, style: 'compressed')
+  return gulp.src(config.paths.sass)
     .pipe plumber
       errorHandler: utils.reportError
+    .pipe sourcemaps.init()
+    .pipe sass({options: {'indentedSyntax': true, 'quiet': true, 'outputStyle': 'compressed'}})
     .pipe prefix("last 4 versions")
     .pipe concat config.targets.cssMin
     .pipe plumber.stop()
