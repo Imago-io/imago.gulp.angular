@@ -51,7 +51,7 @@ generateSass = ->
     .pipe plumber
       errorHandler: utils.reportError
     .pipe sourcemaps.init()
-    .pipe sass({options: {'indentedSyntax': true, 'quiet': true}})
+    .pipe sass({indentedSyntax: true, quiet: true})
     .pipe prefix("last 4 versions")
     .pipe concat config.targets.css
     .pipe sourcemaps.write()
@@ -66,7 +66,7 @@ gulp.task "sassProduction", ->
     .pipe plumber
       errorHandler: utils.reportError
     .pipe sourcemaps.init()
-    .pipe sass({options: {'indentedSyntax': true, 'quiet': true, 'outputStyle': 'compressed'}})
+    .pipe sass({indentedSyntax: true, quiet: true, outputStyle: 'compressed'})
     .pipe prefix("last 4 versions")
     .pipe concat config.targets.cssMin
     .pipe plumber.stop()
