@@ -84,6 +84,7 @@ class Upload
 
       (err) =>
         console.log 'done uploading files...'
+        flushurl = "http://#{_this.opts.tenant}.imago.io/api/flushcache"
         if _this.opts.setdefault
           console.log 'going to set the default version to', _this.version
           url = _this.domain + '/api/setdefault'
@@ -91,9 +92,12 @@ class Upload
             version: _this.version
             _tenant: _this.opts.tenant
           restler.postJson(url, data).on 'complete', (data, response) ->
-            restler.get(_this.domain + '/api/flushcache').on 'complete', ->
+            console.log 'set default....'
+            restler.get(flushurl).on 'complete', ->
               console.log 'all done!'
-
+        else
+          restler.get(flushurl).on 'complete', ->
+            console.log 'all done!'
 
 
 module.exports = (dest) ->
