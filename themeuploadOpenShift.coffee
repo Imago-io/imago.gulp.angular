@@ -91,7 +91,8 @@ class Upload
             version: _this.version
             _tenant: _this.opts.tenant
           restler.postJson(url, data).on 'complete', (data, response) ->
-            console.log 'all done!'
+            restler.get(_this.domain + '/api/flushcache').on 'complete', ->
+              console.log 'all done!'
 
 
 
