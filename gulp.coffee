@@ -48,7 +48,10 @@ fonts  = (if config.targets.fonts  then "#{config.dest}/#{config.targets.fonts}"
 images = (if config.targets.images then "#{config.dest}/#{config.targets.images}" else "#{config.dest}/i")
 
 generateSass = ->
-  return gulp.src(config.paths.sass)
+
+
+gulp.task "sass", ->
+  gulp.src(config.paths.sass)
     .pipe plumber
       errorHandler: utils.reportError
     .pipe sourcemaps.init()
@@ -60,19 +63,18 @@ generateSass = ->
     .pipe gulp.dest config.dest
     .pipe browserSync.reload(stream:true)
 
-gulp.task "sass", generateSass
-
 gulp.task "sassProduction", ->
-  return gulp.src(config.paths.sass)
+  gulp.src(config.paths.sass)
     .pipe plumber
       errorHandler: utils.reportError
     .pipe sourcemaps.init()
     .pipe sass({indentedSyntax: true, quiet: true, outputStyle: 'compressed'})
     .pipe prefix("last 4 versions")
     .pipe concat config.targets.cssMin
+    .pipe gulp.dest config.dest
+    .pipe gzip()
     .pipe plumber.stop()
     .pipe gulp.dest config.dest
-    .pipe browserSync.reload(stream:true)
 
 gulp.task "coffee", ->
   gulp.src config.paths.coffee
