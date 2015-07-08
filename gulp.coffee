@@ -22,6 +22,7 @@ sass            = require 'gulp-sass'
 templateCache   = require 'gulp-angular-templatecache'
 
 uglify          = require 'gulp-uglify'
+gzip            = require 'gulp-gzip'
 rename          = require 'gulp-rename'
 sourcemaps      = require 'gulp-sourcemaps'
 watch           = require 'gulp-watch'
@@ -258,6 +259,8 @@ minify = ->
     .pipe uglify
       mangle: false
     .pipe rename(config.targets.jsMin)
+    .pipe gulp.dest config.dest
+    .pipe gzip()
     .pipe gulp.dest config.dest
 
 gulp.task "build", ['production'], minify
