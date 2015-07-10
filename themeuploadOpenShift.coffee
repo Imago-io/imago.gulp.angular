@@ -1,12 +1,13 @@
-fs      = require "fs"
-restler = require "restler"
-walk    = require "walkdir"
-YAML    = require "libyaml"
-mime    = require "mime"
-md5     = require "MD5"
-pathMod = require "path"
-async   = require "async"
-Q       = require "q"
+fs      = require("fs")
+restler = require("restler")
+request = require("request")
+walk    = require("walkdir")
+YAML    = require("libyaml")
+mime    = require("mime")
+md5     = require("MD5")
+pathMod = require("path")
+async   = require("async")
+Q       = require("q")
 
 
 class Upload
@@ -15,7 +16,7 @@ class Upload
 
     @inpath      = inpath
     @opts        = {}
-    @exclude     = ['theme.yaml', 'index.html', 'coffee.js', 'scripts.js', 'templates.js', 'application.js', 'application.js.map']
+    @exclude     = ['theme.yaml', 'index.html', 'application.min.js', 'application.min.css']
     @domain      = ''
     @version     = null
     @totalfiles  = 0
@@ -34,7 +35,7 @@ class Upload
     @getNextVersion()
 
   getDomain: ->
-    @domain = 'http://themes-nex9.rhcloud.com'
+    @domain = "https://#{@opts.tenant}.imago.io"
     @domain = 'http://localhost:8001' if @opts.debug
 
   parseYaml: =>
@@ -46,7 +47,7 @@ class Upload
     url = @domain + '/api/nextversion'
 
     console.log 'nextversion url', url
-
+      
     restler.postJson(url, {'_tenant': @opts.tenant}).on 'complete', (data, response) =>
       @version = parseInt data
       console.log 'themeversion is', @version
@@ -65,40 +66,51 @@ class Upload
     _this        = @
     async.eachLimit paths, 10,
       (path, cb) =>
-        ext     = pathMod.extname path
-        stats   = fs.statSync(path)
-        mimetype = mime.lookup path
-        fs.readFile path, (err, buf) =>
-          data =
-            multipart : true
-            data  : {
-              file  : restler.file(path, null, stats.size, null, mimetype)
-              path  : path.split('/public')[1]
-              tenant: _this.opts.tenant
-              md5   : md5(buf)
-            }
-          url = _this.domain + "/#{_this.version}/uploadfile"
-          restler.post(url, data).on 'complete', (data, response) =>
-            console.log pathMod.basename(path), '...done'
-            cb()
 
+        ext      = pathMod.extname path
+        mimetype = mime.lookup path.replace(/\.gz$/, '')
+
+        stats = fs.stat path, (err, stats) =>
+
+          payload =
+            'action'  : 'uploadurl'
+            'filename': path.split('/public')[1].replace(/\.gz$/, '')
+            'mimetype': mimetype
+            'version' : _this.version
+            'tenant'  : _this.opts.tenant
+
+          isGzip = ext is '.gz'
+
+          url = "#{_this.domain}/api/themefile/upload"
+          restler.postJson(url, payload).on 'complete', (gcsurl, response) =>
+   
+            request = require('request')
+            rstream = fs.createReadStream(path)
+            rstream.pipe request.put(gcsurl).on 'response', (resp) =>
+              console.log pathMod.basename(path), '...done'
+              fs.readFile path, (err, buf) =>
+
+                themefile =
+                  isGzip  : isGzip
+                  _tenant : _this.opts.tenant
+                  path    : payload.filename
+                  version : _this.version
+                  md5     : md5(buf)
+                  size    : stats.size
+                  mimetype: mimetype
+                  gs_path : "#{_this.opts.tenant}/#{_this.version}#{payload.filename}"
+                url = "#{_this.domain}/api/themefile"
+                restler.postJson(url, themefile).on 'complete', (data, response) -> cb()
       (err) =>
         console.log 'done uploading files...'
-        flushurl = "http://#{_this.opts.tenant}.imago.io/api/flushcache"
         if _this.opts.setdefault
           console.log 'going to set the default version to', _this.version
           url = _this.domain + '/api/setdefault'
-          data =
+          data = 
             version: _this.version
             _tenant: _this.opts.tenant
           restler.postJson(url, data).on 'complete', (data, response) ->
-            console.log 'set default....'
-            restler.get(flushurl).on 'complete', ->
-              console.log 'all done!'
-        else
-          restler.get(flushurl).on 'complete', ->
             console.log 'all done!'
-
 
 module.exports = (dest) ->
   defer = Q.defer()
