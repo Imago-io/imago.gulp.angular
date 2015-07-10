@@ -47,8 +47,6 @@ syncBrowsers = (if typeof config.browserSync then config.browserSync else true)
 fonts  = (if config.targets.fonts  then "#{config.dest}/#{config.targets.fonts}"  else "#{config.dest}/i/fonts")
 images = (if config.targets.images then "#{config.dest}/#{config.targets.images}" else "#{config.dest}/i")
 
-generateSass = ->
-
 
 gulp.task "sass", ->
   gulp.src(config.paths.sass)
@@ -71,7 +69,7 @@ gulp.task "sassProduction", ->
     .pipe sass({indentedSyntax: true, quiet: true, outputStyle: 'compressed'})
     .pipe prefix("last 4 versions")
     .pipe concat config.targets.cssMin
-    .pipe gulp.dest config.dest
+    # .pipe gulp.dest config.dest
     .pipe gzip()
     .pipe plumber.stop()
     .pipe gulp.dest config.dest
@@ -261,7 +259,7 @@ minify = ->
     .pipe uglify
       mangle: false
     .pipe rename(config.targets.jsMin)
-    .pipe gulp.dest config.dest
+    # .pipe gulp.dest config.dest
     .pipe gzip()
     .pipe gulp.dest config.dest
 
