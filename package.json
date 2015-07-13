@@ -1,6 +1,6 @@
 {
   "name": "imago-gulp-angular",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Angular gulp for NEX9 LLC",
   "main": "./index.js",
   "scripts": {
@@ -45,9 +45,11 @@
   "private": true,
   "repository": {
     "type": "git",
-    "url": "git@github.com:Nex9/imago.gulp.angular.git"
+    "url": "git+https://github.com/Nex9/imago.gulp.angular"
   },
-  "readme": "Imago Angular",
+  "_id": "imago-gulp-angular@0.0.5",
+  "_from": "imago-gulp-angular@~0.0.5",
+  "readme": "Imago Gulp Angular",
   "devDependencies": {
     "karma": "^0.12.31",
     "karma-chrome-launcher": "^0.1.5",
