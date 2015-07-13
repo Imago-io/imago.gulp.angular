@@ -36,6 +36,8 @@ class Upload
 
   getDomain: ->
     @domain = "https://#{@opts.tenant}.imago.io"
+    if @opts.tenant in ['-admin-', '-account-']
+      @domain = 'https://themes-nex9.rhcloud.com'
     @domain = 'http://localhost:8001' if @opts.debug
 
   parseYaml: =>
@@ -45,8 +47,6 @@ class Upload
 
   getNextVersion: ->
     url = @domain + '/api/nextversion'
-
-    console.log 'nextversion url', url
       
     restler.postJson(url, {'_tenant': @opts.tenant}).on 'complete', (data, response) =>
       @version = parseInt data
