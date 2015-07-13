@@ -18,7 +18,6 @@ ngClassify      = require 'gulp-ng-classify'
 plumber         = require 'gulp-plumber'
 prefix          = require 'gulp-autoprefixer'
 sass            = require 'gulp-sass'
-# sassRuby        = require 'gulp-ruby-sass'
 templateCache   = require 'gulp-angular-templatecache'
 
 uglify          = require 'gulp-uglify'
@@ -28,7 +27,6 @@ sourcemaps      = require 'gulp-sourcemaps'
 watch           = require 'gulp-watch'
 modRewrite      = require 'connect-modrewrite'
 exec            = require('child_process').exec
-rimraf          = require 'rimraf'
 Q               = require 'q'
 
 updateNotifier  = require 'update-notifier'
@@ -69,7 +67,6 @@ gulp.task "sassProduction", ->
     .pipe sass({indentedSyntax: true, quiet: true, outputStyle: 'compressed'})
     .pipe prefix("last 4 versions")
     .pipe concat config.targets.cssMin
-    # .pipe gulp.dest config.dest
     .pipe gzip()
     .pipe plumber.stop()
     .pipe gulp.dest config.dest
@@ -259,7 +256,6 @@ minify = ->
     .pipe uglify
       mangle: false
     .pipe rename(config.targets.jsMin)
-    # .pipe gulp.dest config.dest
     .pipe gzip()
     .pipe gulp.dest config.dest
 
@@ -300,26 +296,6 @@ gulp.task "update", ['npm', 'bower'], ->
   gulp.src('bower_components/imago/css/images/*.*')
     .pipe(flatten())
     .pipe(gulp.dest(images))
-
-
-# Tests
-
-# gulp.task "testBrowser", ->
-#   connect.server
-#     root: "#{config.dest}"
-#     fallback: "#{config.dest}/index.html"
-
-# gulp.task "webdriver_update", webdriver_update
-
-# gulp.task "webdriver_standalone", webdriver_standalone
-
-# gulp.task "test", ['webdriver_update', 'testBrowser'], (cb) ->
-#   ThemeTests.protractor(config)
-
-# gulp.task "karma", ->
-#   ThemeTests.karma(config)
-
-# End Tests
 
 gulp.task "default", ["watch"]
 
