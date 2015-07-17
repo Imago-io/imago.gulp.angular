@@ -4,7 +4,7 @@ request = require("request")
 walk    = require("walkdir")
 YAML    = require("libyaml")
 mime    = require("mime")
-md5     = require("MD5")
+md5     = require("md5")
 pathMod = require("path")
 async   = require("async")
 Q       = require("q")
@@ -47,7 +47,7 @@ class Upload
 
   getNextVersion: ->
     url = @domain + '/api/nextversion'
-      
+
     restler.postJson(url, {'_tenant': @opts.tenant}).on 'complete', (data, response) =>
       @version = parseInt data
       console.log 'themeversion is', @version
@@ -83,7 +83,7 @@ class Upload
 
           url = "#{_this.domain}/api/themefile/upload"
           restler.postJson(url, payload).on 'complete', (gcsurl, response) =>
-   
+
             request = require('request')
             rstream = fs.createReadStream(path)
             rstream.pipe request.put(gcsurl).on 'response', (resp) =>
@@ -106,7 +106,7 @@ class Upload
         if _this.opts.setdefault
           console.log 'going to set the default version to', _this.version
           url = _this.domain + '/api/setdefault'
-          data = 
+          data =
             version: _this.version
             _tenant: _this.opts.tenant
           restler.postJson(url, data).on 'complete', (data, response) ->

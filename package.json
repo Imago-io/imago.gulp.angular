@@ -10,7 +10,7 @@
     "name": "Nex9 LLC"
   },
   "dependencies": {
-    "MD5": "*",
+    "md5": "*",
     "async": "*",
     "browser-sync": "~2",
     "coffee-script": "~1",
