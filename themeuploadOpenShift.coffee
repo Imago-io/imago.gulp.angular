@@ -48,7 +48,15 @@ class Upload
   getNextVersion: ->
     url = @domain + '/api/nextversion'
 
-    restler.postJson(url, {'_tenant': @opts.tenant}).on 'complete', (data, response) =>
+    opts =
+      headers: {
+        Authorization: "Basic #{new Buffer("#{@opts.apikey}:").toString('base64')}"
+      }
+
+    restler.postJson(url, {'_tenant': @opts.tenant}, opts).on 'complete', (data, response) =>
+      if response.statusCode != 200
+        console.log 'Error', data, 'statusCode:', response.statusCode, 'for nextversion request'
+        return
       @version = parseInt data
       console.log 'themeversion is', @version
       @walkFiles()
@@ -82,7 +90,13 @@ class Upload
           isGzip = ext is '.gz'
 
           url = "#{_this.domain}/api/themefile/upload"
-          restler.postJson(url, payload).on 'complete', (gcsurl, response) =>
+
+          opts =
+            headers: {
+              Authorization: "Basic #{new Buffer("#{_this.opts.apikey}:").toString('base64')}"
+            }
+
+          restler.postJson(url, payload, opts).on 'complete', (gcsurl, response) =>
 
             request = require('request')
             rstream = fs.createReadStream(path)
