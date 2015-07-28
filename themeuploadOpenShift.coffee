@@ -63,6 +63,7 @@ class Upload
 
   pathFilter: (path) =>
     fname = path.split('/')[path.split('/').length-1]
+    return false if path.match(/public\/templates/)
     return false if fs.lstatSync(path).isDirectory()
     return false if fname in @exclude
     return false if fname.indexOf('.') is 0
