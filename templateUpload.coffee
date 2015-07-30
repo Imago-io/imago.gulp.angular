@@ -31,7 +31,7 @@ class Upload
     @domain = 'http://localhost:8000' if @opts.debug
 
   parseYaml: =>
-    yamlPath = @inpath+'/public/theme.yaml'
+    yamlPath = @inpath+'/theme.yaml'
     process.kill() unless fs.existsSync yamlPath
     @opts = YAML.readFileSync(yamlPath)[0]
 
