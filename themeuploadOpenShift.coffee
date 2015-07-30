@@ -9,8 +9,6 @@ pathMod = require("path")
 async   = require("async")
 Q       = require("q")
 
-console.log 'test'
-
 class Upload
 
   constructor: (inpath) ->
