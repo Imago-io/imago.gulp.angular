@@ -16,7 +16,7 @@ class Upload
 
     @inpath      = inpath
     @opts        = {}
-    @exclude     = ['theme.yaml', 'index.html', 'application.min.js', 'application.min.css']
+    @exclude     = ['theme.yaml', 'index.html', 'application.js.map', 'scripts.js', 'templates.js', 'coffee.js', 'application.min.js', 'application.min.css']
     @domain      = ''
     @version     = null
     @totalfiles  = 0
