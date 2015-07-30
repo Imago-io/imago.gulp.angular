@@ -9,7 +9,8 @@ pathMod = require("path")
 async   = require("async")
 Q       = require("q")
 
-# console.log 'test'
+console.log 'test 2'
+
 
 class Upload
 
