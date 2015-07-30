@@ -74,7 +74,7 @@ class Upload
         filename = basename.match(/(.*)\.jade/)[1]
         # console.log 'basename', basename, 'filename', filename
 
-        templateObj = 
+        templateObj =
           jade : ''
           css  : ''
           name : basename
@@ -107,8 +107,3 @@ module.exports = (dest) ->
     console.log 'something went wrong'
 
   defer.promise
-
-
-module.exports = TemplateUpload
-
-
