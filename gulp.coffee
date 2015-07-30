@@ -219,7 +219,7 @@ gulp.task 'watch', ['compile'], ->
   , ->
     gulp.start('combine')
 
-gulp.task 'build', ['combine'], ->
+gulp.task 'build', ['compile'], ->
   gulp.src "#{config.dest}/#{config.targets.js}"
     .pipe uglify
       mangle: false
