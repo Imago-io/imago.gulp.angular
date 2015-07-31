@@ -56,6 +56,7 @@ gulp.task 'sass', ->
     .pipe sourcemaps.write()
     .pipe gulp.dest config.dest
     .pipe browserSync.reload(stream: true)
+    .pipe rename(config.targets.cssMin)
     .pipe gzip()
     .pipe plumber.stop()
     .pipe gulp.dest config.dest
