@@ -36,11 +36,12 @@ TemplateUpload  = require './templateUpload'
 # ThemeTests      = require './themetests'
 utils           = require './themeutils'
 pkg             = require './package.json'
+restler         = require 'restler'
 config          = require '../../gulp'
 
 sketch          = require 'gulp-sketch'
 
-updateNotifier({packageName: pkg.name, packageVersion: pkg.version}).notify()
+# updateNotifier({packageName: pkg.name, packageVersion: pkg.version}).notify()
 
 syncBrowsers = config.browserSync or true
 fonts  = (if config.targets.fonts  then "#{config.dest}/#{config.targets.fonts}"  else "#{config.dest}/i/fonts")
@@ -228,10 +229,19 @@ gulp.task 'build', ['compile'], ->
     .pipe gzip()
     .pipe gulp.dest config.dest
 
-gulp.task 'deploy', ['build'], ->
+gulp.task 'deploy', ->
   defer = Q.defer()
-  ThemeUploadOS(config.dest).then ->
-    defer.resolve()
+  hash = pkg._resolved
+  idx = hash.indexOf '.git#'
+  sha = hash.substring(idx + 5)
+
+  restler.get('https://api.github.com/repos/Nex9/imago.gulp.angular/events').on 'complete', (response) =>
+    if sha is response[0]?.payload?.commits[0]?.sha
+      ThemeUploadOS(config.dest).then ->
+        defer.resolve()
+    else
+      utils.reportError({message: 'There is an newer version for the imago.gulp.angular package available.'}, 'Update Available')
+
   defer.promise
 
 gulp.task 'deploy-gae', ['build'], ->
