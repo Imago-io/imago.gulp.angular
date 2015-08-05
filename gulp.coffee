@@ -178,7 +178,7 @@ gulp.task 'watch', ['compile'], ->
   gulp.start('browser-sync')
 
   watch
-    glob: config.paths.index, emitOnGlob: false
+    glob: "#{config.dest}/*.jade", emitOnGlob: false
   , ->
     gulp.start('index')
 
