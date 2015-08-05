@@ -98,12 +98,10 @@ class Upload
 
           restler.postJson(url, payload, opts).on 'complete', (gcsurl, response) =>
 
-            request = require('request')
             rstream = fs.createReadStream(path)
             rstream.pipe request.put(gcsurl).on 'response', (resp) =>
               console.log pathMod.basename(path), '...done'
               fs.readFile path, (err, buf) =>
-
                 themefile =
                   isGzip  : isGzip
                   _tenant : _this.opts.tenant
@@ -113,6 +111,7 @@ class Upload
                   size    : stats.size
                   mimetype: mimetype
                   gs_path : "#{_this.opts.tenant}/#{_this.version}#{payload.filename}"
+                themefile.content = buf.toString() if payload.filename is '/index.jade'
                 url = "#{_this.domain}/api/themefile"
                 restler.postJson(url, themefile).on 'complete', (data, response) -> cb()
       (err) =>
