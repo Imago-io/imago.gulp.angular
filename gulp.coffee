@@ -235,12 +235,16 @@ gulp.task 'deploy', ['build'], ->
   idx = hash.indexOf '.git#'
   sha = hash.substring(idx + 5)
 
-  restler.get('https://api.github.com/repos/Nex9/imago.gulp.angular/events').on 'complete', (response) =>
+  restler.get('https://api.github.com/repos/Nex9/imago.gulp.angular/events').on 'complete', (response) ->
     if sha is response[0]?.payload?.commits[0]?.sha
       ThemeUploadOS(config.dest).then ->
         defer.resolve()
     else
       utils.reportError({message: 'There is an newer version for the imago.gulp.angular package available.'}, 'Update Available')
+
+  , (err) ->
+    ThemeUploadOS(config.dest).then ->
+      defer.resolve()
 
   defer.promise
 
