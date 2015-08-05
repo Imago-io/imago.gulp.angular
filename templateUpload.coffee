@@ -24,17 +24,26 @@ class Upload
     @getDomain()
     # console.log 'domain is', @domain
     # console.log 'opts', @opts
-    @walkFiles()
+    @clearTemplates => @walkFiles()
 
   getDomain: ->
-    @domain = "https://api.imago.io"
-    @domain = 'http://localhost:8000' if @opts.debug
+    @domain   = "https://api.imago.io"
+    @domain   = 'http://localhost:8000' if @opts.debug
+    @endpoint = "#{@domain}/v1/templates"
+
 
   parseYaml: =>
     yamlPath = @inpath+'/theme.yaml'
     process.kill() unless fs.existsSync yamlPath
     @opts = YAML.readFileSync(yamlPath)[0]
 
+
+  clearTemplates: (cb) ->
+    opts =
+      headers: {
+        Authorization: "Basic #{new Buffer("#{@opts.apikey}:").toString('base64')}"
+      }
+    restler.del(@endpoint, opts).on 'complete', -> cb()
 
   pathFilter: (path) =>
     fname = path.split('/')[path.split('/').length-1]
@@ -44,8 +53,6 @@ class Upload
     true
 
   postTemplates: (templateObj, cb) ->
-    endpoint = "#{@domain}/v1/templates"
-
     # console.log 'endpoint', endpoint
     # console.log 'apikey', @opts.apikey
     opts =
@@ -53,7 +60,7 @@ class Upload
         Authorization: "Basic #{new Buffer("#{@opts.apikey}:").toString('base64')}"
       }
 
-    restler.postJson(endpoint, templateObj, opts).on 'complete', (data, response) ->
+    restler.postJson(@endpoint, templateObj, opts).on 'complete', (data, response) ->
       if response.statusCode != 200
         console.log 'Error', data, 'statusCode:', response.statusCode, 'for file', templateObj.name
         cb()
