@@ -2,10 +2,10 @@ gutil           = require 'gulp-util'
 notification    = require 'node-notifier'
 
 module.exports =
-  reportError: (err) ->
+  reportError: (err, title = 'Error running Gulp') ->
     gutil.beep()
     notification.notify
-      title: "Error running Gulp"
+      title: title
       message: err.message
     gutil.log err.message
-    @emit 'end'
+    @emit 'end' if @emit

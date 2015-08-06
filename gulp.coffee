@@ -229,14 +229,14 @@ gulp.task 'build', ['compile'], ->
     .pipe gzip()
     .pipe gulp.dest config.dest
 
-gulp.task 'deploy', ['build'], ->
+gulp.task 'deploy', ->
   defer = Q.defer()
   hash = pkg._resolved
-  idx = hash.indexOf '.git#'
-  sha = hash.substring(idx + 5)
+  idx = hash.indexOf '#'
+  sha = hash.substring(idx + 1)
 
   restler.get('https://api.github.com/repos/Nex9/imago.gulp.angular/events').on 'complete', (response) ->
-    if sha is response[0]?.payload?.commits[0]?.sha
+    if sha is response[0]?.payload?.head
       ThemeUploadOS(config.dest).then ->
         defer.resolve()
     else
