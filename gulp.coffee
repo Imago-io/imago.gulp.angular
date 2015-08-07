@@ -229,7 +229,7 @@ gulp.task 'build', ['compile'], ->
     .pipe gzip()
     .pipe gulp.dest config.dest
 
-gulp.task 'deploy', ->
+gulp.task 'deploy', ['build'], ->
   defer = Q.defer()
   hash = pkg._resolved
   idx = hash.indexOf '#'
