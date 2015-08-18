@@ -169,7 +169,7 @@ gulp.task "browser-sync", ->
     debugInfo: false
     notify: false
 
-  options.ghostMode = config.browserSync if typeof config.browserSync isnt undefined
+  options.ghostMode = config.browserSync if config.browserSync isnt undefined
 
   browserSync.init ["#{config.dest}/index.html"], options
 
