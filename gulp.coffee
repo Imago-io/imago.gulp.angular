@@ -43,7 +43,6 @@ sketch          = require 'gulp-sketch'
 
 # updateNotifier({packageName: pkg.name, packageVersion: pkg.version}).notify()
 
-syncBrowsers = if typeof config.browserSync isnt undefined then config.browserSync else true
 fonts  = (if config.targets.fonts  then "#{config.dest}/#{config.targets.fonts}"  else "#{config.dest}/i/fonts")
 images = (if config.targets.images then "#{config.dest}/#{config.targets.images}" else "#{config.dest}/i")
 
@@ -170,9 +169,7 @@ gulp.task "browser-sync", ->
     debugInfo: false
     notify: false
 
-  console.log 'syncBrowsers', syncBrowsers
-
-  options.ghostMode = false unless syncBrowsers
+  options.ghostMode = config.browserSync if typeof config.browserSync isnt undefined
 
   browserSync.init ["#{config.dest}/index.html"], options
 
