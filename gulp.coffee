@@ -43,8 +43,8 @@ sketch          = require 'gulp-sketch'
 
 # updateNotifier({packageName: pkg.name, packageVersion: pkg.version}).notify()
 
-fonts  = (if config.targets.fonts  then "#{config.dest}/#{config.targets.fonts}"  else "#{config.dest}/i/fonts")
-images = (if config.targets.images then "#{config.dest}/#{config.targets.images}" else "#{config.dest}/i")
+fonts  = "#{config.dest}/#{config.targets.fonts}" or "#{config.dest}/i/fonts"
+images = "#{config.dest}/#{config.targets.images}" or "#{config.dest}/i"
 
 gulp.task 'sass', ->
   gulp.src(config.paths.sass)
