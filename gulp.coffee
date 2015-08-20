@@ -61,7 +61,7 @@ gulp.task 'sass', ->
     .pipe plumber.stop()
     .pipe gulp.dest config.dest
 
-gulp.task "coffee", ->
+gulp.task 'coffee', ->
   gulp.src config.paths.coffee
     .pipe plumber({errorHandler: utils.reportError})
     .pipe ngClassify(
@@ -94,14 +94,14 @@ gulp.task "coffee", ->
     .pipe concat config.targets.coffee
     .pipe gulp.dest config.dest
 
-gulp.task "jade", ->
+gulp.task 'jade', ->
   gulp.src config.paths.jade
     .pipe plumber({errorHandler: utils.reportError})
     .pipe jade({locals: {}}).on('error', utils.reportError)
     .pipe templateCache(
       standalone: true
       root: "/#{config.src}/"
-      module: "templatesApp"
+      module: 'templatesApp'
     )
     .pipe concat config.targets.jade
     .pipe gulp.dest config.dest
@@ -116,13 +116,13 @@ gulp.task 'sketch', ->
       trimmed: false)
     .pipe gulp.dest "#{config.dest}/i"
 
-gulp.task "scripts", ->
+gulp.task 'scripts', ->
   gulp.src config.paths.libs
     .pipe plumber({errorHandler: utils.reportError})
     .pipe concat config.targets.scripts
     .pipe gulp.dest config.dest
 
-gulp.task "index", ->
+gulp.task 'index', ->
   return unless config.paths.index
   gulp.src config.paths.index
     .pipe plumber(
@@ -134,8 +134,7 @@ gulp.task "index", ->
       ).on('error', utils.reportError)
     .pipe gulp.dest config.dest
 
-gulp.task "combine", ->
-
+gulp.task 'combine', ->
   rethrow = (err, filename, lineno) -> throw err
 
   files = [
@@ -153,13 +152,13 @@ gulp.task "combine", ->
     .pipe gulp.dest config.dest
     .pipe browserSync.reload(stream:true)
 
-gulp.task "js", ["scripts", "coffee", "jade"], (next) ->
+gulp.task 'js', ['scripts', 'coffee', 'jade'], (next) ->
   next()
 
-gulp.task "compile", ["index", "sass", "js", "sketch"], ->
+gulp.task 'compile', ['index', 'sass', 'js', 'sketch'], ->
   gulp.start('combine')
 
-gulp.task "browser-sync", ->
+gulp.task 'browser-sync', ->
   options =
     server:
       baseDir: "#{config.dest}"
@@ -269,7 +268,7 @@ gulp.task 'bower', ->
 
 gulp.task "npm", ->
   defer = Q.defer()
-  exec 'npm update', (error, stdout, stderr) ->
+  exec 'npm install', (error, stdout, stderr) ->
     console.log 'result: ' + stdout
     console.log 'exec error: ' + error if error isnt null
     defer.resolve()
