@@ -238,7 +238,7 @@ gulp.task 'deploy', ['build'], ->
       ThemeUploadOS(config.dest).then ->
         defer.resolve()
     else
-      utils.reportError({message: 'There is an newer version for the imago.gulp.angular package available.'}, 'Update Available')
+      utils.reportError({message: 'There is a newer version for the imago.gulp.angular package available.'}, 'Update Available')
 
   , (err) ->
     ThemeUploadOS(config.dest).then ->
