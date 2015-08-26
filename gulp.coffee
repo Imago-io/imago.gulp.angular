@@ -56,7 +56,23 @@ gulp.task 'sass', ->
     .pipe sourcemaps.write()
     .pipe gulp.dest config.dest
     .pipe browserSync.reload(stream: true)
-    .pipe rename(config.targets.cssMin)
+    .pipe rename('application.min.css')
+    .pipe gzip()
+    .pipe plumber.stop()
+    .pipe gulp.dest config.dest
+
+gulp.task 'customSass', ->
+  return unless config.paths.customSass
+  gulp.src(config.paths.customSass)
+    .pipe plumber({errorHandler: utils.reportError})
+    .pipe sourcemaps.init()
+    .pipe sass({indentedSyntax: true, quiet: true})
+    .pipe prefix('last 4 versions')
+    .pipe concat config.targets.customCss
+    .pipe sourcemaps.write()
+    .pipe gulp.dest config.dest
+    .pipe browserSync.reload(stream: true)
+    .pipe rename('custom.min.css')
     .pipe gzip()
     .pipe plumber.stop()
     .pipe gulp.dest config.dest
@@ -155,7 +171,7 @@ gulp.task 'combine', ->
 gulp.task 'js', ['scripts', 'coffee', 'jade'], (next) ->
   next()
 
-gulp.task 'compile', ['index', 'sass', 'js', 'sketch'], ->
+gulp.task 'compile', ['index', 'customSass', 'sass', 'js', 'sketch'], ->
   gulp.start('combine')
 
 gulp.task 'browser-sync', ->
@@ -223,7 +239,7 @@ gulp.task 'build', ['compile'], ->
   gulp.src "#{config.dest}/#{config.targets.js}"
     .pipe uglify
       mangle: false
-    .pipe rename(config.targets.jsMin)
+    .pipe rename('application.min.js')
     .pipe gzip()
     .pipe gulp.dest config.dest
 
