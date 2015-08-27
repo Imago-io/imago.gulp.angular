@@ -33,6 +33,8 @@ updateNotifier  = require 'update-notifier'
 # ThemeUpload     = require './themeupload'
 ThemeUploadOS   = require './themeuploadOpenShift'
 TemplateUpload  = require './templateUpload'
+fs              = require 'fs'
+YAML            = require 'libyaml'
 # ThemeTests      = require './themetests'
 utils           = require './themeutils'
 pkg             = require './package.json'
@@ -57,22 +59,6 @@ gulp.task 'sass', ->
     .pipe gulp.dest config.dest
     .pipe browserSync.reload(stream: true)
     .pipe rename('application.min.css')
-    .pipe gzip()
-    .pipe plumber.stop()
-    .pipe gulp.dest config.dest
-
-gulp.task 'customSass', ->
-  return unless config.paths.customSass
-  gulp.src(config.paths.customSass)
-    .pipe plumber({errorHandler: utils.reportError})
-    .pipe sourcemaps.init()
-    .pipe sass({indentedSyntax: true, quiet: true})
-    .pipe prefix('last 4 versions')
-    .pipe concat config.targets.customCss
-    .pipe sourcemaps.write()
-    .pipe gulp.dest config.dest
-    .pipe browserSync.reload(stream: true)
-    .pipe rename('custom.min.css')
     .pipe gzip()
     .pipe plumber.stop()
     .pipe gulp.dest config.dest
@@ -171,8 +157,10 @@ gulp.task 'combine', ->
 gulp.task 'js', ['scripts', 'coffee', 'jade'], (next) ->
   next()
 
-gulp.task 'compile', ['index', 'customSass', 'sass', 'js', 'sketch'], ->
+gulp.task 'compile', ['index', 'sass', 'js', 'sketch'], ->
   gulp.start('combine')
+
+
 
 gulp.task 'browser-sync', ->
   options =
@@ -297,6 +285,48 @@ gulp.task 'update', ['npm', 'bower'], ->
   gulp.src('bower_components/imago/css/images/*.*')
     .pipe(flatten())
     .pipe(gulp.dest(images))
+
+
+# START Custom Sass Developer
+
+gulp.task 'custom-sass', ->
+  return 'no path for customSass found' unless config.paths.customSass
+  gulp.src(config.paths.customSass)
+    .pipe plumber({errorHandler: utils.reportError})
+    .pipe sourcemaps.init()
+    .pipe sass({indentedSyntax: true, quiet: true})
+    .pipe prefix('last 4 versions')
+    .pipe concat config.targets.customCss
+    .pipe sourcemaps.write()
+    .pipe gulp.dest config.dest
+    .pipe browserSync.reload(stream: true)
+    .pipe rename('custom.min.css')
+    .pipe gzip()
+    .pipe plumber.stop()
+    .pipe gulp.dest config.dest
+
+gulp.task 'develop-custom-sass', ->
+  return 'no path for customSass found' unless config.paths.customSass
+  yamlPath = config.dest + '/theme.yaml'
+  return 'no YAML file found' unless fs.existsSync yamlPath
+  yamlOpts = YAML.readFileSync(yamlPath)[0]
+
+  options =
+    files: ["#{config.dest}/#{config.targets.customCss}"]
+    proxy: "https://#{yamlOpts.tenant}.imago.io/account/checkout/--ID--",
+    serveStatic: [config.dest]
+    rewriteRules: [
+      {
+        match: /(latest\/custom\.min\.css)/
+        fn: (match) ->
+          return config.targets.customCss
+      }
+    ]
+
+  browserSync.init options
+  gulp.watch(config.paths.customSass, ['custom-sass'])
+
+# END Custom Sass Developer
 
 gulp.task 'default', ['watch']
 
