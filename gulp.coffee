@@ -289,7 +289,7 @@ gulp.task 'update', ['npm', 'bower'], ->
 
 # START Custom Sass Developer
 
-gulp.task 'custom-sass', ->
+gulp.task 'customsass', ->
   return 'no path for customSass found' unless config.paths.customSass
   gulp.src(config.paths.customSass)
     .pipe plumber({errorHandler: utils.reportError})
@@ -305,10 +305,10 @@ gulp.task 'custom-sass', ->
     .pipe plumber.stop()
     .pipe gulp.dest config.dest
 
-gulp.task 'develop-custom-sass', ->
+gulp.task 'watch-customsass', ->
   return 'no path for customSass found' unless config.paths.customSass
   yamlPath = config.dest + '/theme.yaml'
-  return 'no YAML file found' unless fs.existsSync yamlPath
+  return 'no YAML file found!' unless fs.existsSync yamlPath
   yamlOpts = YAML.readFileSync(yamlPath)[0]
 
   options =
@@ -324,7 +324,7 @@ gulp.task 'develop-custom-sass', ->
     ]
 
   browserSync.init options
-  gulp.watch(config.paths.customSass, ['custom-sass'])
+  gulp.watch(config.paths.customSass, ['customsass'])
 
 # END Custom Sass Developer
 
