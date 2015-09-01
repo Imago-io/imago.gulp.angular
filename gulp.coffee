@@ -306,7 +306,6 @@ gulp.task 'customsass', ->
 
 gulp.task 'watch-customsass', ->
   return 'no path for customSass found' unless config.paths.customSass
-
   options =
     files: ["#{config.dest}/#{config.targets.customCss}"]
     proxy: "https://#{yamlOpts.tenant}.imago.io/account/checkout/--ID--",
