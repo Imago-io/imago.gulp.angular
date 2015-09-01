@@ -1,5 +1,4 @@
 browserSync     = require 'browser-sync'
-connect         = require 'gulp-connect'
 
 coffee          = require 'gulp-coffee'
 coffeelint      = require 'gulp-coffeelint'
@@ -34,7 +33,8 @@ updateNotifier  = require 'update-notifier'
 ThemeUploadOS   = require './themeuploadOpenShift'
 TemplateUpload  = require './templateUpload'
 fs              = require 'fs'
-YAML            = require 'libyaml'
+YAML            = require 'js-yaml'
+inject          = require 'gulp-inject-string'
 # ThemeTests      = require './themetests'
 utils           = require './themeutils'
 pkg             = require './package.json'
@@ -44,6 +44,8 @@ config          = require '../../gulp'
 sketch          = require 'gulp-sketch'
 
 # updateNotifier({packageName: pkg.name, packageVersion: pkg.version}).notify()
+
+yamlOpts = YAML.safeLoad(fs.readFileSync(config.dest + '/theme.yaml'))
 
 fonts  = "#{config.dest}/#{config.targets.fonts}" or "#{config.dest}/i/fonts"
 images = "#{config.dest}/#{config.targets.images}" or "#{config.dest}/i"
@@ -126,6 +128,10 @@ gulp.task 'scripts', ->
 
 gulp.task 'index', ->
   return unless config.paths.index
+  YamlHeader = '<script type="text/javascript">window.yaml = ' +
+          JSON.stringify(yamlOpts) +
+          '</script>'
+
   gulp.src config.paths.index
     .pipe plumber(
       errorHandler: utils.reportError
@@ -134,6 +140,8 @@ gulp.task 'index', ->
       locals: {}
       pretty: true
       ).on('error', utils.reportError)
+
+    .pipe(inject.after('<head>', YamlHeader))
     .pipe gulp.dest config.dest
 
 gulp.task 'combine', ->
@@ -159,8 +167,6 @@ gulp.task 'js', ['scripts', 'coffee', 'jade'], (next) ->
 
 gulp.task 'compile', ['index', 'sass', 'js', 'sketch'], ->
   gulp.start('combine')
-
-
 
 gulp.task 'browser-sync', ->
   options =
@@ -307,9 +313,6 @@ gulp.task 'customsass', ->
 
 gulp.task 'watch-customsass', ->
   return 'no path for customSass found' unless config.paths.customSass
-  yamlPath = config.dest + '/theme.yaml'
-  return 'no YAML file found!' unless fs.existsSync yamlPath
-  yamlOpts = YAML.readFileSync(yamlPath)[0]
 
   options =
     files: ["#{config.dest}/#{config.targets.customCss}"]

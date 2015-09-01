@@ -1,11 +1,11 @@
-fs      = require("fs")
-restler = require("restler")
-walk    = require("walkdir")
-YAML    = require("libyaml")
-sass    = require("node-sass")
-pathMod = require("path")
-async   = require("async")
-Q       = require("q")
+fs      = require 'fs'
+restler = require 'restler'
+walk    = require 'walkdir'
+YAML    = require 'js-yaml'
+sass    = require 'node-sass'
+pathMod = require 'path'
+async   = require 'async'
+Q       = require 'q'
 
 class Upload
 
@@ -35,7 +35,7 @@ class Upload
   parseYaml: =>
     yamlPath = @inpath+'/theme.yaml'
     process.kill() unless fs.existsSync yamlPath
-    @opts = YAML.readFileSync(yamlPath)[0]
+    @opts = YAML.safeLoad(fs.readFileSync(yamlPath))
 
 
   clearTemplates: (cb) ->

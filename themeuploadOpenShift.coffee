@@ -1,13 +1,13 @@
-fs      = require("fs")
-restler = require("restler")
-request = require("request")
-walk    = require("walkdir")
-YAML    = require("libyaml")
-mime    = require("mime")
-md5     = require("md5")
-pathMod = require("path")
-async   = require("async")
-Q       = require("q")
+fs      = require 'fs'
+restler = require 'restler'
+request = require 'request'
+walk    = require 'walkdir'
+YAML    = require 'js-yaml'
+mime    = require 'mime'
+md5     = require 'md5'
+pathMod = require 'path'
+async   = require 'async'
+Q       = require 'q'
 
 class Upload
 
@@ -42,7 +42,7 @@ class Upload
   parseYaml: =>
     yamlPath = @inpath+'/theme.yaml'
     process.kill() unless fs.existsSync yamlPath
-    @opts = YAML.readFileSync(yamlPath)[0]
+    @opts = YAML.safeLoad(fs.readFileSync(yamlPath))
 
   getNextVersion: ->
     url = @domain + '/api/nextversion'

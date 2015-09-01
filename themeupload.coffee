@@ -1,7 +1,7 @@
 fs      = require 'fs'
 restler = require 'restler'
 walk    = require 'walkdir'
-YAML    = require 'libyaml'
+YAML    = require 'js-yaml'
 mime    = require 'mime'
 hash    = require 'mhash'
 Q       = require 'q'
@@ -41,7 +41,7 @@ class Upload
   parseYaml: =>
     yamlPath = @inpath+'/theme.yaml'
     process.kill() unless fs.existsSync yamlPath
-    @opts = YAML.readFileSync(yamlPath)[0]
+    @opts = YAML.safeLoad(fs.readFileSync(yamlPath))
 
   getNextVersion: ->
     getNextDone = (data) =>
