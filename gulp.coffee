@@ -28,7 +28,7 @@ modRewrite      = require 'connect-modrewrite'
 exec            = require('child_process').exec
 Q               = require 'q'
 
-updateNotifier  = require 'update-notifier'
+latestVersion   = require 'latest-version'
 # ThemeUpload     = require './themeupload'
 ThemeUploadOS   = require './themeuploadOpenShift'
 TemplateUpload  = require './templateUpload'
@@ -42,8 +42,6 @@ restler         = require 'restler'
 config          = require '../../gulp'
 
 sketch          = require 'gulp-sketch'
-
-# updateNotifier({packageName: pkg.name, packageVersion: pkg.version}).notify()
 
 yamlOpts = YAML.safeLoad(fs.readFileSync(config.dest + '/theme.yaml'))
 
@@ -237,24 +235,19 @@ gulp.task 'build', ['compile'], ->
     .pipe gzip()
     .pipe gulp.dest config.dest
 
-gulp.task 'deploy', ['build'], ->
+checkUpdate = ->
   defer = Q.defer()
-  hash = pkg._resolved
-  idx = hash.indexOf '#'
-  sha = hash.substring(idx + 1)
 
-  restler.get('https://api.github.com/repos/Nex9/imago.gulp.angular/events').on 'complete', (response) ->
-    if sha is response[0]?.payload?.head
-      ThemeUploadOS(config.dest).then ->
-        defer.resolve()
-    else
-      utils.reportError({message: 'There is a newer version for the imago.gulp.angular package available.'}, 'Update Available')
-
-  , (err) ->
-    ThemeUploadOS(config.dest).then ->
-      defer.resolve()
+  latestVersion pkg.name, (err, version) ->
+    return defer.resolve() if version is pkg.version
+    utils.reportError({message: "There is a newer version for the imago-gulp-angular package available (#{version})."}, 'Update Available')
+    defer.reject()
 
   defer.promise
+
+gulp.task 'deploy', ['build'], ->
+  checkUpdate().then ->
+    ThemeUploadOS(config.dest)
 
 gulp.task 'deploy-gae', ['build'], ->
   defer = Q.defer()
