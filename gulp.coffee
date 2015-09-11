@@ -263,7 +263,7 @@ gulp.task 'deploy-templates', ->
 
 gulp.task 'bower', ->
   defer = Q.defer()
-  exec 'bower update', (error, stdout, stderr) ->
+  exec 'bower install; bower update', (error, stdout, stderr) ->
     console.log 'result: ' + stdout
     console.log 'exec error: ' + error if error isnt null
     defer.resolve()
@@ -271,7 +271,7 @@ gulp.task 'bower', ->
 
 gulp.task "npm", ->
   defer = Q.defer()
-  exec 'npm install', (error, stdout, stderr) ->
+  exec 'npm update', (error, stdout, stderr) ->
     console.log 'result: ' + stdout
     console.log 'exec error: ' + error if error isnt null
     defer.resolve()
