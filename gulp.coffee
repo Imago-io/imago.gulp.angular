@@ -245,7 +245,7 @@ checkUpdate = ->
 
   defer.promise
 
-gulp.task 'deploy', ['build'], ->
+gulp.task 'deploy', ['build', 'customsass'], ->
   checkUpdate().then ->
     ThemeUploadOS(config.dest)
 
