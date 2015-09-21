@@ -14,6 +14,7 @@ ngClassify      = require 'gulp-ng-classify'
 # webdriver_standalone = require('gulp-protractor').webdriver_standalone
 # webdriver_update = require('gulp-protractor').webdriver_update
 
+runSequence     = require 'run-sequence'
 plumber         = require 'gulp-plumber'
 prefix          = require 'gulp-autoprefixer'
 sass            = require 'gulp-sass'
@@ -163,8 +164,9 @@ gulp.task 'combine', ->
 gulp.task 'js', ['scripts', 'coffee', 'jade'], (next) ->
   next()
 
-gulp.task 'compile', ['index', 'sass', 'js', 'sketch'], ->
-  gulp.start('combine')
+gulp.task 'compile', ['index', 'sass', 'js', 'sketch'], (cb) ->
+  runSequence 'combine', ->
+    cb()
 
 gulp.task 'browser-sync', ->
   options =

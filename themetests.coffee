@@ -79,5 +79,5 @@ module.exports =
       .pipe protractor
         configFile: "tests/protractor.config.js"
       .on "error", utils.reportError
-      .on "end", () ->
+      .on "end", ->
         connect.serverClose()
