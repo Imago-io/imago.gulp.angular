@@ -53,7 +53,7 @@ gulp.task 'sass', ->
   gulp.src(config.paths.sass)
     .pipe plumber({errorHandler: utils.reportError})
     .pipe sourcemaps.init()
-    .pipe sass({indentedSyntax: true, quiet: true})
+    .pipe sass({indentedSyntax: true, quiet: true, outputStyle: 'compressed'})
     .pipe prefix('last 4 versions')
     .pipe concat config.targets.css
     .pipe sourcemaps.write()
