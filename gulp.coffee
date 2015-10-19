@@ -1,48 +1,23 @@
+gulp            = require 'gulp'
+plugins         = require('gulp-load-plugins')()
 browserSync     = require 'browser-sync'
 
-coffee          = require 'gulp-coffee'
-coffeelint      = require 'gulp-coffeelint'
-
-concat          = require 'gulp-concat'
-flatten         = require 'gulp-flatten'
-
-gulp            = require 'gulp'
-
-jade            = require 'gulp-jade'
-
-ngClassify      = require 'gulp-ng-classify'
-# webdriver_standalone = require('gulp-protractor').webdriver_standalone
-# webdriver_update = require('gulp-protractor').webdriver_update
-
 runSequence     = require 'run-sequence'
-plumber         = require 'gulp-plumber'
-prefix          = require 'gulp-autoprefixer'
-sass            = require 'gulp-sass'
-templateCache   = require 'gulp-angular-templatecache'
 
-uglify          = require 'gulp-uglify'
-gzip            = require 'gulp-gzip'
-rename          = require 'gulp-rename'
-sourcemaps      = require 'gulp-sourcemaps'
-watch           = require 'gulp-watch'
 modRewrite      = require 'connect-modrewrite'
 exec            = require('child_process').exec
 Q               = require 'q'
 
 latestVersion   = require 'latest-version'
-# ThemeUpload     = require './themeupload'
 ThemeUploadOS   = require './themeuploadOpenShift'
 TemplateUpload  = require './templateUpload'
+ThemeTests      = require './themetests'
 fs              = require 'fs'
 YAML            = require 'js-yaml'
-inject          = require 'gulp-inject-string'
-# ThemeTests      = require './themetests'
 utils           = require './themeutils'
 pkg             = require './package.json'
 restler         = require 'restler'
 config          = require '../../gulp'
-
-sketch          = require 'gulp-sketch'
 
 yamlOpts = YAML.safeLoad(fs.readFileSync(config.dest + '/theme.yaml'))
 
@@ -51,23 +26,23 @@ images = "#{config.dest}/#{config.targets.images}" or "#{config.dest}/i"
 
 gulp.task 'sass', ->
   gulp.src(config.paths.sass)
-    .pipe plumber({errorHandler: utils.reportError})
-    .pipe sourcemaps.init()
-    .pipe sass({indentedSyntax: true, quiet: true, outputStyle: 'compressed'})
-    .pipe prefix('last 4 versions')
-    .pipe concat config.targets.css
-    .pipe sourcemaps.write()
+    .pipe plugins.plumber({errorHandler: utils.reportError})
+    .pipe plugins.sourcemaps.init()
+    .pipe plugins.sass({indentedSyntax: true, quiet: true, outputStyle: 'compressed'})
+    .pipe plugins.autoprefixer('last 4 versions')
+    .pipe plugins.concat config.targets.css
+    .pipe plugins.sourcemaps.write()
     .pipe gulp.dest config.dest
     .pipe browserSync.reload(stream: true)
-    .pipe rename('application.min.css')
-    .pipe gzip()
-    .pipe plumber.stop()
+    .pipe plugins.rename('application.min.css')
+    .pipe plugins.gzip()
+    .pipe plugins.plumber.stop()
     .pipe gulp.dest config.dest
 
 gulp.task 'coffee', ->
   gulp.src config.paths.coffee
-    .pipe plumber({errorHandler: utils.reportError})
-    .pipe ngClassify(
+    .pipe plugins.plumber({errorHandler: utils.reportError})
+    .pipe plugins.ngClassify(
       animation:
         format: 'camelCase'
         prefix: ''
@@ -90,30 +65,30 @@ gulp.task 'coffee', ->
       value:
         format: 'camelCase'
       )
-    .pipe coffee(
+    .pipe plugins.coffee(
       bare: true
     ).on('error', utils.reportError)
-    .pipe coffeelint()
-    .pipe concat config.targets.coffee
+    .pipe plugins.coffeelint()
+    .pipe plugins.concat config.targets.coffee
     .pipe gulp.dest config.dest
 
 gulp.task 'jade', ->
   gulp.src config.paths.jade
-    .pipe plumber({errorHandler: utils.reportError})
-    .pipe jade({locals: {}}).on('error', utils.reportError)
-    .pipe templateCache(
+    .pipe plugins.plumber({errorHandler: utils.reportError})
+    .pipe plugins.jade({locals: {}}).on('error', utils.reportError)
+    .pipe plugins.angularTemplatecache(
       standalone: true
       root: "/#{config.src}/"
       module: 'templatesApp'
     )
-    .pipe concat config.targets.jade
+    .pipe plugins.concat config.targets.jade
     .pipe gulp.dest config.dest
 
 gulp.task 'sketch', ->
   return unless config.paths.sketch
   gulp.src config.paths.sketch
-    .pipe plumber({errorHandler: utils.reportError})
-    .pipe sketch(
+    .pipe plugins.plumber({errorHandler: utils.reportError})
+    .pipe plugins.sketch(
       export: 'artboards'
       saveForWeb: true
       trimmed: false)
@@ -121,8 +96,8 @@ gulp.task 'sketch', ->
 
 gulp.task 'scripts', ->
   gulp.src config.paths.libs
-    .pipe plumber({errorHandler: utils.reportError})
-    .pipe concat config.targets.scripts
+    .pipe plugins.plumber({errorHandler: utils.reportError})
+    .pipe plugins.concat config.targets.scripts
     .pipe gulp.dest config.dest
 
 gulp.task 'index', ->
@@ -132,15 +107,15 @@ gulp.task 'index', ->
           '</script>'
 
   gulp.src config.paths.index
-    .pipe plumber(
+    .pipe plugins.plumber(
       errorHandler: utils.reportError
     )
-    .pipe jade(
+    .pipe plugins.jade(
       locals: {}
       pretty: true
       ).on('error', utils.reportError)
 
-    .pipe(inject.after('<head>', YamlHeader))
+    .pipe(plugins.injectString.after('<head>', YamlHeader))
     .pipe gulp.dest config.dest
 
 gulp.task 'combine', ->
@@ -155,9 +130,9 @@ gulp.task 'combine', ->
   sources = files.map (file) -> "#{config.dest}/#{file}"
 
   gulp.src sources
-    .pipe sourcemaps.init()
-    .pipe concat config.targets.js
-    .pipe sourcemaps.write "./maps"
+    .pipe plugins.sourcemaps.init()
+    .pipe plugins.concat config.targets.js
+    .pipe plugins.sourcemaps.write "./maps"
     .pipe gulp.dest config.dest
     .pipe browserSync.reload(stream:true)
 
@@ -186,37 +161,32 @@ gulp.task 'watch', ['compile'], ->
 
   gulp.start('browser-sync')
 
-  watch
+  plugins.watch
     glob: "#{config.dest}/*.jade", emitOnGlob: false
   , ->
     gulp.start('index')
 
-  watch
+  plugins.watch
     glob: ['css/*.sass', "#{config.src}/**/*.sass"], emitOnGlob: false
   , ->
     gulp.start('sass')
 
-  watch
-    glob: config.paths.watchJs, emitOnGlob: false
+  plugins.watch
+    glob: config.paths.libs, emitOnGlob: false
   , ->
     gulp.start('scripts')
 
-  watch
+  plugins.watch
     glob: config.paths.jade, emitOnGlob: false
   , ->
     gulp.start('jade')
 
-  watch
+  plugins.watch
     glob: config.paths.sketch, emitOnGlob: false
   , ->
     gulp.start('sketch')
 
-  watch
-    glob: 'bower_components/imago/dist/**/*.*', emitOnGlob: false
-  , ->
-    gulp.start('scripts')
-
-  watch
+  plugins.watch
     glob: config.paths.coffee, emitOnGlob: false
   , ->
     gulp.start('coffee')
@@ -224,17 +194,41 @@ gulp.task 'watch', ['compile'], ->
   files = [config.targets.scripts, config.targets.jade, config.targets.coffee]
   sources = ("#{config.dest}/#{file}" for file in files)
 
-  watch
+  plugins.watch
     glob: sources, emitOnGlob: false
   , ->
     gulp.start('combine')
 
+gulp.task 'bower', ->
+  defer = Q.defer()
+  exec 'bower install; bower update', (error, stdout, stderr) ->
+    console.log 'result: ' + stdout
+    console.log 'exec error: ' + error if error isnt null
+    defer.resolve()
+  return defer.promise
+
+gulp.task "npm", ->
+  defer = Q.defer()
+  exec 'npm update', (error, stdout, stderr) ->
+    console.log 'result: ' + stdout
+    console.log 'exec error: ' + error if error isnt null
+    defer.resolve()
+  return defer.promise
+
+gulp.task 'update', ['npm', 'bower'], ->
+  gulp.src('bower_components/imago/**/fonts/*.*')
+    .pipe(plugins.flatten())
+    .pipe(gulp.dest(fonts))
+  gulp.src('bower_components/imago/css/images/*.*')
+    .pipe(plugins.flatten())
+    .pipe(gulp.dest(images))
+
 gulp.task 'build', ['compile'], ->
   gulp.src "#{config.dest}/#{config.targets.js}"
-    .pipe uglify
+    .pipe plugins.uglify
       mangle: false
-    .pipe rename('application.min.js')
-    .pipe gzip()
+    .pipe plugins.rename('application.min.js')
+    .pipe plugins.gzip()
     .pipe gulp.dest config.dest
 
 checkUpdate = ->
@@ -263,47 +257,22 @@ gulp.task 'deploy-templates', ->
     defer.resolve()
   defer.promise
 
-gulp.task 'bower', ->
-  defer = Q.defer()
-  exec 'bower install; bower update', (error, stdout, stderr) ->
-    console.log 'result: ' + stdout
-    console.log 'exec error: ' + error if error isnt null
-    defer.resolve()
-  return defer.promise
-
-gulp.task "npm", ->
-  defer = Q.defer()
-  exec 'npm update', (error, stdout, stderr) ->
-    console.log 'result: ' + stdout
-    console.log 'exec error: ' + error if error isnt null
-    defer.resolve()
-  return defer.promise
-
-gulp.task 'update', ['npm', 'bower'], ->
-  gulp.src('bower_components/imago/**/fonts/*.*')
-    .pipe(flatten())
-    .pipe(gulp.dest(fonts))
-  gulp.src('bower_components/imago/css/images/*.*')
-    .pipe(flatten())
-    .pipe(gulp.dest(images))
-
-
 # START Custom Sass Developer
 
 gulp.task 'customsass', ->
   return 'no path for customSass found' unless config.paths.customSass
   gulp.src(config.paths.customSass)
-    .pipe plumber({errorHandler: utils.reportError})
-    .pipe sourcemaps.init()
-    .pipe sass({indentedSyntax: true, quiet: true})
-    .pipe prefix('last 4 versions')
-    .pipe concat config.targets.customCss
-    .pipe sourcemaps.write()
+    .pipe plugins.plumber({errorHandler: utils.reportError})
+    .pipe plugins.sourcemaps.init()
+    .pipe plugins.sass({indentedSyntax: true, quiet: true})
+    .pipe plugins.autoprefixer('last 4 versions')
+    .pipe plugins.concat config.targets.customCss
+    .pipe plugins.sourcemaps.write()
     .pipe gulp.dest config.dest
     .pipe browserSync.reload(stream: true)
-    .pipe rename('custom.min.css')
-    .pipe gzip()
-    .pipe plumber.stop()
+    .pipe plugins.rename('custom.min.css')
+    .pipe plugins.gzip()
+    .pipe plugins.plumber.stop()
     .pipe gulp.dest config.dest
 
 gulp.task 'watch-customsass', ->
@@ -324,6 +293,13 @@ gulp.task 'watch-customsass', ->
   gulp.watch(config.paths.customSass, ['customsass'])
 
 # END Custom Sass Developer
+
+# START Tests
+
+gulp.task 'karma', (cb) ->
+  ThemeTests(gulp, plugins).karma(config, cb)
+
+# END Tests
 
 gulp.task 'default', ['watch']
 

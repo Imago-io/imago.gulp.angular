@@ -1,83 +1,75 @@
 fs              = require 'fs'
-plumber         = require 'gulp-plumber'
-gulp            = require 'gulp'
-ngClassify      = require 'gulp-ng-classify'
-coffee          = require 'gulp-coffee'
-templateCache   = require 'gulp-angular-templatecache'
-concat          = require 'gulp-concat'
 karma           = require('karma').server
-utils           = require './themeutils'
 protractor      = require('gulp-protractor').protractor
-connect         = require 'gulp-connect'
+utils           = require './themeutils'
 
-module.exports =
-  karma: (config) ->
-    return console.log 'no path for tests' unless config.tempTests
+module.exports = (gulp, plugins) ->
 
-    try
-      fs.statSync(config.tempTests)
-    catch e
-      if e.code is 'ENOENT'
-        fs.mkdirSync(config.tempTests)
+  return {
 
-    YOUR_LOCALS = {}
-    gulp.src config.paths.coffee
-      .pipe plumber(
-        errorHandler: utils.reportError
-      )
-      .pipe ngClassify(
-        appName: 'imago.widgets.angular'
-        animation:
-          format: 'camelCase'
-          prefix: ''
-        constant:
-          format: 'camelCase'
-          prefix: ''
-        controller:
-          format: 'camelCase'
-          suffix: ''
-        factory:
-          format: 'camelCase'
-        filter:
-          format: 'camelCase'
-        provider:
-          format: 'camelCase'
-          suffix: ''
-        service:
-          format: 'camelCase'
-          suffix: ''
-        value:
-          format: 'camelCase'
+    karma: (config) ->
+      return console.log 'no path for tests' unless config.paths.tests.tmpFolder
+
+      try
+        fs.statSync(config.paths.tests.tmpFolder)
+      catch e
+        if e.code is 'ENOENT'
+          fs.mkdirSync(config.paths.tests.tmpFolder)
+
+      gulp.src config.paths.coffee
+        .pipe plugins.plumber({errorHandler: utils.reportError})
+        .pipe plugins.ngClassify(
+          animation:
+            format: 'camelCase'
+            prefix: ''
+          constant:
+            format: 'camelCase'
+            prefix: ''
+          controller:
+            format: 'camelCase'
+            suffix: ''
+          factory:
+            format: 'camelCase'
+          filter:
+            format: 'camelCase'
+          provider:
+            format: 'camelCase'
+            suffix: ''
+          service:
+            format: 'camelCase'
+            suffix: ''
+          value:
+            format: 'camelCase'
+          )
+        .pipe plugins.coffee(
+          bare: true
+        ).on('error', utils.reportError)
+        .pipe gulp.dest config.paths.tests.tmpFolder
+
+      gulp.src config.paths.jade
+        .pipe plugins.plumber({errorHandler: utils.reportError})
+        .pipe plugins.jade({locals: {}}).on('error', utils.reportError)
+        .pipe plugins.angularTemplatecache(
+          standalone: true
+          root: "/#{config.src}/"
+          module: 'templatesApp'
         )
-      .pipe coffee(
-        bare: true
-      ).on('error', utils.reportError)
-      .pipe gulp.dest config.tempTests
-    gulp.src config.paths.jade
-      .pipe plumber(
-        errorHandler: utils.reportError
-      )
-      .pipe jade({locals: YOUR_LOCALS}).on('error', utils.reportError)
-      .pipe templateCache(
-        standalone: true
-        root: "/imagoWidgets/"
-        module: "ImagoWidgetsTemplates"
-      )
-      .pipe concat config.targets.jade
-      .pipe gulp.dest config.tempTests
-    karma.start(
-      configFile: "#{tests}/karma.conf.coffee"
-      singleRun: true
-      )
-    console.log 'passed'
-    # rimraf(config.tempTests)
+        .pipe plugins.concat config.targets.jade
+        .pipe gulp.dest config.paths.tests.tmpFolder
 
-  protractor: (config) ->
-    return console.log 'no path for tests' unless config.tempTests
+      karma.start(
+        configFile: config.paths.tests.karmaConf
+        singleRun: true
+        )
 
-    gulp.src(config.paths.tests)
-      .pipe protractor
-        configFile: "tests/protractor.config.js"
-      .on "error", utils.reportError
-      .on "end", ->
-        connect.serverClose()
+    protractor: (config) ->
+      return console.log 'no path for tests' unless config.paths.tests.tmpFolder
+
+      gulp.src(config.paths.tests.e2e)
+        .pipe protractor
+          configFile: config.paths.tests.protractorConf
+        .on 'error', utils.reportError
+        .on 'end', ->
+          plugins.connect.serverClose()
+
+  }

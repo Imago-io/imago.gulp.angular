@@ -96,24 +96,35 @@ class Upload
               Authorization: "Basic #{new Buffer("#{_this.opts.apikey}:").toString('base64')}"
             }
 
-          restler.postJson(url, payload, opts).on 'complete', (gcsurl, response) =>
+          requestUrl = (retries = 0) =>
+            retries++
+            time = 500 * retries
+            return if retries is 5
+            timeout = setTimeout (=>
+              restler.postJson(url, payload, opts).on 'complete', (gcsurl, response) =>
+                clearTimeout(timeout)
+                unless response.statusCode is 200
+                  return requestUrl(retries)
 
-            rstream = fs.createReadStream(path)
-            rstream.pipe request.put(gcsurl).on 'response', (resp) =>
-              console.log pathMod.basename(path), '...done'
-              fs.readFile path, (err, buf) =>
-                themefile =
-                  isGzip  : isGzip
-                  _tenant : _this.opts.tenant
-                  path    : payload.filename
-                  version : _this.version
-                  md5     : md5(buf)
-                  size    : stats.size
-                  mimetype: mimetype
-                  gs_path : "#{_this.opts.tenant}/#{_this.version}#{payload.filename}"
-                themefile.content = buf.toString() if payload.filename is '/index.jade'
-                url = "#{_this.domain}/api/themefile"
-                restler.postJson(url, themefile).on 'complete', (data, response) -> cb()
+                rstream = fs.createReadStream(path)
+                rstream.pipe request.put(gcsurl).on 'response', (resp) =>
+                  console.log pathMod.basename(path), '...done'
+                  fs.readFile path, (err, buf) =>
+                    themefile =
+                      isGzip  : isGzip
+                      _tenant : _this.opts.tenant
+                      path    : payload.filename
+                      version : _this.version
+                      md5     : md5(buf)
+                      size    : stats.size
+                      mimetype: mimetype
+                      gs_path : "#{_this.opts.tenant}/#{_this.version}#{payload.filename}"
+                    themefile.content = buf.toString() if payload.filename is '/index.jade'
+                    url = "#{_this.domain}/api/themefile"
+                    restler.postJson(url, themefile).on 'complete', (data, response) -> cb()
+            ), time
+
+          requestUrl()
       (err) =>
         console.log 'done uploading files...'
         if _this.opts.setdefault
@@ -130,7 +141,6 @@ module.exports = (dest) ->
 
   if fs.existsSync(dest) and fs.existsSync(dest)
     new Upload(dest, -> defer.resolve())
-
   else
     defer.resolve()
     console.log 'something went wrong'
