@@ -235,9 +235,9 @@ checkUpdate = ->
   defer = Q.defer()
 
   latestVersion pkg.name, (err, version) ->
-    return defer.resolve() if version is pkg.version
-    utils.reportError({message: "There is a newer version for the imago-gulp-angular package available (#{version})."}, 'Update Available')
-    defer.reject()
+    if version isnt pkg.version
+      utils.reportError({message: "There is a newer version for the imago-gulp-angular package available (#{version})."}, 'Update Available')
+    return defer.resolve()
 
   defer.promise
 
