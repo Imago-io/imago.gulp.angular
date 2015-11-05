@@ -34,9 +34,7 @@ class Upload
     @getNextVersion()
 
   getDomain: ->
-    @domain = "https://#{@opts.tenant}.imago.io"
-    if @opts.tenant in ['-admin-', '-account-']
-      @domain = 'https://themes-nex9.rhcloud.com'
+    @domain = "https://imago.imago.io"
     @domain = 'http://localhost:8001' if @opts.debug
 
   parseYaml: =>

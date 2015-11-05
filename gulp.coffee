@@ -9,7 +9,7 @@ exec            = require('child_process').exec
 Q               = require 'q'
 
 latestVersion   = require 'latest-version'
-ThemeUploadOS   = require './themeuploadOpenShift'
+ThemeUpload   = require './themeuploadDocker'
 TemplateUpload  = require './templateUpload'
 ThemeTests      = require './themetests'
 fs              = require 'fs'
@@ -243,7 +243,7 @@ checkUpdate = ->
 
 gulp.task 'deploy', ['build', 'customsass'], ->
   checkUpdate().then ->
-    ThemeUploadOS(config.dest)
+    ThemeUpload(config.dest)
 
 gulp.task 'deploy-gae', ['build'], ->
   defer = Q.defer()
