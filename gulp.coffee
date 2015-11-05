@@ -9,7 +9,7 @@ exec            = require('child_process').exec
 Q               = require 'q'
 
 latestVersion   = require 'latest-version'
-ThemeUpload   = require './themeuploadDocker'
+ThemeUpload     = require './themeuploadDocker'
 TemplateUpload  = require './templateUpload'
 ThemeTests      = require './themetests'
 fs              = require 'fs'
