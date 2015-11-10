@@ -6,15 +6,19 @@ runSequence     = require 'run-sequence'
 
 modRewrite      = require 'connect-modrewrite'
 exec            = require('child_process').exec
-Q               = require 'q'
+
+_               = require 'lodash'
+through         = require 'through2'
+path            = require 'path'
 
 latestVersion   = require 'latest-version'
-ThemeUpload     = require './themeuploadDocker'
-TemplateUpload  = require './templateUpload'
-ThemeTests      = require './themetests'
+ThemeUpload     = require './tasks/themeuploadDocker'
+TemplateUpload  = require './tasks/templateUpload'
+ThemeTests      = require './tasks/themetests'
 fs              = require 'fs'
 YAML            = require 'js-yaml'
-utils           = require './themeutils'
+del             = require 'del'
+utils           = require './tasks/themeutils'
 pkg             = require './package.json'
 restler         = require 'restler'
 config          = require '../../gulp'
@@ -35,6 +39,7 @@ gulp.task 'sass', ->
     .pipe gulp.dest config.dest
     .pipe browserSync.reload(stream: true)
     .pipe plugins.rename('application.min.css')
+    .pipe gulp.dest config.dest
     .pipe plugins.gzip()
     .pipe plugins.plumber.stop()
     .pipe gulp.dest config.dest
@@ -102,9 +107,10 @@ gulp.task 'scripts', ->
 
 gulp.task 'index', ->
   return unless config.paths.index
-  YamlHeader = '<script type="text/javascript">window.yaml = ' +
-          JSON.stringify(yamlOpts) +
-          '</script>'
+  if plugins.util.env.env is 'dev'
+    YamlHeader = '<script type="text/javascript">window.yaml = ' +
+            JSON.stringify(yamlOpts) +
+            '</script>'
 
   gulp.src config.paths.index
     .pipe plugins.plumber(
@@ -115,7 +121,7 @@ gulp.task 'index', ->
       pretty: true
       ).on('error', utils.reportError)
 
-    .pipe(plugins.injectString.after('<head>', YamlHeader))
+    .pipe(plugins.if(plugins.util.env.env is 'dev', plugins.injectString.after('<head>', YamlHeader)))
     .pipe gulp.dest config.dest
 
 gulp.task 'combine', ->
@@ -140,8 +146,7 @@ gulp.task 'js', ['scripts', 'coffee', 'jade'], (next) ->
   next()
 
 gulp.task 'compile', ['index', 'sass', 'js', 'sketch'], (cb) ->
-  runSequence 'combine', ->
-    cb()
+  runSequence 'combine', cb
 
 gulp.task 'browser-sync', ->
   options =
@@ -153,13 +158,14 @@ gulp.task 'browser-sync', ->
     debugInfo: false
     notify: false
 
-  options.ghostMode = config.browserSync if config.browserSync isnt undefined
+  if _.isPlainObject config.browserSync
+    _.assign options, config.browserSync
 
   browserSync.init ["#{config.dest}/index.html"], options
 
-gulp.task 'watch', ['compile'], ->
-
-  gulp.start('browser-sync')
+gulp.task 'watch', ->
+  plugins.util.env.env = 'dev'
+  runSequence 'compile', 'browser-sync'
 
   plugins.watch
     glob: "#{config.dest}/*.jade", emitOnGlob: false
@@ -199,21 +205,17 @@ gulp.task 'watch', ['compile'], ->
   , ->
     gulp.start('combine')
 
-gulp.task 'bower', ->
-  defer = Q.defer()
+gulp.task 'bower', (cb) ->
   exec 'bower install; bower update', (error, stdout, stderr) ->
     console.log 'result: ' + stdout
     console.log 'exec error: ' + error if error isnt null
-    defer.resolve()
-  return defer.promise
+    cb()
 
-gulp.task "npm", ->
-  defer = Q.defer()
+gulp.task "npm", (cb) ->
   exec 'npm update', (error, stdout, stderr) ->
     console.log 'result: ' + stdout
     console.log 'exec error: ' + error if error isnt null
-    defer.resolve()
-  return defer.promise
+    cb()
 
 gulp.task 'update', ['npm', 'bower'], ->
   gulp.src('bower_components/imago/**/fonts/*.*')
@@ -228,34 +230,27 @@ gulp.task 'build', ['compile'], ->
     .pipe plugins.uglify
       mangle: false
     .pipe plugins.rename('application.min.js')
+    .pipe gulp.dest config.dest
     .pipe plugins.gzip()
     .pipe gulp.dest config.dest
 
-checkUpdate = ->
-  defer = Q.defer()
-
+gulp.task 'check-update', (cb) ->
   latestVersion pkg.name, (err, version) ->
     if version isnt pkg.version
       utils.reportError({message: "There is a newer version for the imago-gulp-angular package available (#{version})."}, 'Update Available')
-    return defer.resolve()
-
-  defer.promise
+    cb()
 
 gulp.task 'deploy', ['build', 'customsass'], ->
-  checkUpdate().then ->
+  gulp.start 'check-update', ->
     ThemeUpload(config.dest)
 
-gulp.task 'deploy-gae', ['build'], ->
-  defer = Q.defer()
+gulp.task 'deploy-gae', ['build'], (cb) ->
   ThemeUpload(config.dest).then ->
-    defer.resolve()
-  defer.promise
+    cb()
 
-gulp.task 'deploy-templates', ->
-  defer = Q.defer()
+gulp.task 'deploy-templates', (cb) ->
   TemplateUpload(config.dest).then ->
-    defer.resolve()
-  defer.promise
+    cb()
 
 # START Custom Sass Developer
 
@@ -300,6 +295,53 @@ gulp.task 'karma', (cb) ->
   ThemeTests(gulp, plugins).karma(config, cb)
 
 # END Tests
+
+# Start Revisions
+
+replaceIndex = (replacement) ->
+  mutables = []
+  changes = []
+
+  return through.obj ((file, enc, cb) ->
+    ext = path.extname(file.path)
+    if ext is '.json'
+      content = file.contents.toString('utf8')
+      json = JSON.parse(content)
+      changes.push json
+    else
+      unless file.isNull()
+        mutables.push file
+    cb()
+  ), (cb) ->
+    mutables.forEach (file) =>
+      src = file.contents.toString('utf8')
+      changes.forEach (change) =>
+        for key, value of change
+          key = key.replace replacement, ''
+          src = src.replace(key, value)
+      file.contents = new Buffer(src)
+      @push file
+    cb()
+
+gulp.task 'rev-inject', (cb) ->
+  gulp.src(["#{config.dest}/*.json", "#{config.dest}/*.html"])
+    .pipe replaceIndex('.min')
+    .pipe gulp.dest config.dest
+
+gulp.task 'rev-clean', ->
+  del("#{config.dest}/**/*.min.*")
+
+gulp.task 'rev-create', ->
+  gulp.src(["#{config.dest}/**/*.min.*" ])
+    .pipe plugins.rev()
+    .pipe gulp.dest config.dest
+    .pipe plugins.rev.manifest()
+    .pipe gulp.dest config.dest
+
+gulp.task 'rev', (cb) ->
+  runSequence 'rev-clean', 'build', 'rev-create', 'rev-inject', cb
+
+# End revisions
 
 gulp.task 'default', ['watch']
 
