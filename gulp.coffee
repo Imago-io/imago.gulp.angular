@@ -10,6 +10,7 @@ exec            = require('child_process').exec
 _               = require 'lodash'
 through         = require 'through2'
 path            = require 'path'
+modifyFilename  = require 'modify-filename'
 
 latestVersion   = require 'latest-version'
 ThemeUpload     = require './tasks/themeuploadDocker'
@@ -334,6 +335,13 @@ gulp.task 'rev-clean', ->
 gulp.task 'rev-create', ->
   gulp.src(["#{config.dest}/**/*.min.*" ])
     .pipe plugins.rev()
+    .pipe through.obj((file, enc, cb) ->
+      file.path = modifyFilename(file.revOrigPath, (name, ext) ->
+        return "#{Date.parse(new Date())}-#{name}#{ext}"
+      )
+      cb null, file
+      return
+    )
     .pipe gulp.dest config.dest
     .pipe plugins.rev.manifest()
     .pipe gulp.dest config.dest

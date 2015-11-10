@@ -1,6 +1,6 @@
 {
   "name": "imago-gulp-angular",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "Angular gulp for NEX9 LLC",
   "main": "./index.js",
   "scripts": {
@@ -51,6 +51,7 @@
     "latest-version": "^1.0.1",
     "md5": "*",
     "mime": "*",
+    "modify-filename": "^1.1.0",
     "node-notifier": "*",
     "node-sass": "^3.2.0",
     "path": "^0.12.7",
