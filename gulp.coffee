@@ -101,6 +101,8 @@ gulp.task 'sketch', ->
     .pipe gulp.dest "#{config.dest}/i"
 
 gulp.task 'scripts', ->
+  if _.isArray config.paths.envSpecJs?[config.env]
+    config.paths.libs = config.paths.envSpecJs[config.env].concat config.paths.libs
   gulp.src config.paths.libs
     .pipe plugins.plumber({errorHandler: utils.reportError})
     .pipe plugins.concat config.targets.scripts
