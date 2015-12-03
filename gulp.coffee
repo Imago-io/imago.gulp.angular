@@ -111,7 +111,7 @@ gulp.task 'scripts', ->
 
 gulp.task 'index', ->
   return unless config.paths.index
-  if plugins.util.env.env is 'dev'
+  if plugins.util.env.envType is 'dev'
     YamlHeader = '<script type="text/javascript">window.yaml = ' +
             JSON.stringify(yamlOpts) +
             '</script>'
@@ -125,7 +125,7 @@ gulp.task 'index', ->
       pretty: true
       ).on('error', utils.reportError)
 
-    .pipe(plugins.if(plugins.util.env.env is 'dev', plugins.injectString.after('<head>', YamlHeader)))
+    .pipe(plugins.if(plugins.util.env.envType is 'dev', plugins.injectString.after('<head>', YamlHeader)))
     .pipe gulp.dest config.dest
 
 gulp.task 'combine', ->
@@ -168,7 +168,7 @@ gulp.task 'browser-sync', ->
   browserSync.init ["#{config.dest}/index.html"], options
 
 gulp.task 'watch', ->
-  plugins.util.env.env = 'dev'
+  plugins.util.env.envType = 'dev'
   runSequence 'compile', 'browser-sync'
 
   plugins.watch
