@@ -130,14 +130,9 @@ class Upload
 
     return defer.promise
 
-module.exports = (dest) ->
-  defer = Q.defer()
-
-  if fs.existsSync(dest) and fs.existsSync(dest)
-    new Upload(dest, -> defer.resolve())
-
+module.exports = (dest, cb) ->
+  if fs.existsSync(dest)
+    new Upload(dest, cb)
   else
-    defer.resolve()
     console.log 'something went wrong'
-
-  defer.promise
+    cb()

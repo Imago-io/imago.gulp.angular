@@ -5,7 +5,6 @@ YAML    = require 'js-yaml'
 sass    = require 'node-sass'
 pathMod = require 'path'
 async   = require 'async'
-Q       = require 'q'
 
 class Upload
 
@@ -102,15 +101,9 @@ class Upload
       (err) =>
         console.log 'done uploading templates...'
 
-
-module.exports = (dest) ->
-  defer = Q.defer()
-
-  if fs.existsSync(dest) and fs.existsSync(dest)
-    new Upload(dest, -> defer.resolve())
-
+module.exports = (dest, cb) ->
+  if fs.existsSync(dest)
+    new Upload(dest, cb)
   else
-    defer.resolve()
     console.log 'something went wrong'
-
-  defer.promise
+    cb()

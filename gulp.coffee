@@ -26,8 +26,8 @@ config          = require '../../gulp'
 
 yamlOpts = YAML.safeLoad(fs.readFileSync(config.dest + '/theme.yaml'))
 
-fonts  = "#{config.dest}/#{config.targets.fonts}" or "#{config.dest}/i/fonts"
-images = "#{config.dest}/#{config.targets.images}" or "#{config.dest}/i"
+fonts  = if config.targets.fonts then "#{config.dest}/#{config.targets.fonts}" else "#{config.dest}/i/fonts"
+images = if config.targets.images then "#{config.dest}/#{config.targets.images}" else "#{config.dest}/i"
 
 gulp.task 'sass', ->
   gulp.src(config.paths.sass)
@@ -215,19 +215,22 @@ gulp.task 'bower', (cb) ->
     console.log 'exec error: ' + error if error isnt null
     cb()
 
-gulp.task "npm", (cb) ->
+gulp.task 'npm', (cb) ->
   exec 'npm update', (error, stdout, stderr) ->
     console.log 'result: ' + stdout
     console.log 'exec error: ' + error if error isnt null
     cb()
 
-gulp.task 'update', ['npm', 'bower'], ->
+gulp.task 'import-imago', ->
   gulp.src('bower_components/imago/**/fonts/*.*')
     .pipe(plugins.flatten())
     .pipe(gulp.dest(fonts))
   gulp.src('bower_components/imago/css/images/*.*')
     .pipe(plugins.flatten())
     .pipe(gulp.dest(images))
+
+gulp.task 'update', ['npm', 'bower'], (cb) ->
+  runSequence 'import-imago', cb
 
 gulp.task 'build', ['compile'], ->
   gulp.src "#{config.dest}/#{config.targets.js}"
@@ -244,17 +247,15 @@ gulp.task 'check-update', (cb) ->
       utils.reportError({message: "There is a newer version for the imago-gulp-angular package available (#{version})."}, 'Update Available')
     cb()
 
-gulp.task 'deploy', ['build', 'customsass'], ->
+gulp.task 'deploy', ['build', 'customsass'], (cb) ->
   gulp.start 'check-update', ->
-    ThemeUpload(config.dest)
+    ThemeUpload(config.dest, cb)
 
 gulp.task 'deploy-gae', ['build'], (cb) ->
-  ThemeUpload(config.dest).then ->
-    cb()
+  ThemeUpload(config.dest, cb)
 
 gulp.task 'deploy-templates', (cb) ->
-  TemplateUpload(config.dest).then ->
-    cb()
+  TemplateUpload(config.dest, cb)
 
 # START Custom Sass Developer
 

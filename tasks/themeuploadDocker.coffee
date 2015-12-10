@@ -139,7 +139,7 @@ class Upload
 module.exports = (dest) ->
   defer = Q.defer()
 
-  if fs.existsSync(dest) and fs.existsSync(dest)
+  if fs.existsSync(dest)
     new Upload(dest, -> defer.resolve())
   else
     defer.resolve()
