@@ -101,9 +101,9 @@ class Upload
       (err) =>
         console.log 'done uploading templates...'
 
-module.exports = (dest, cb) ->
+module.exports = (dest) ->
   if fs.existsSync(dest)
-    new Upload(dest, cb)
+    new Upload(dest)
   else
     console.log 'something went wrong'
     cb()

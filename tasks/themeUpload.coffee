@@ -7,15 +7,18 @@ mime    = require 'mime'
 md5     = require 'md5'
 pathMod = require 'path'
 async   = require 'async'
-Q       = require 'q'
 
 class Upload
 
-  constructor: (inpath) ->
+  constructor: (inpath, callback) ->
 
+    @callback    = callback
     @inpath      = inpath
     @opts        = {}
-    @exclude     = ['theme.yaml', 'index.html', 'application.js.map', 'application.js', 'scripts.js', 'templates.js', 'coffee.js', 'application.min.js', 'application.min.css']
+    @exclude     = ['theme.yaml', 'index.html', 'application.js.map', \
+                    'application.js', 'scripts.js', 'templates.js', \
+                    'coffee.js', 'application.min.js', 'application.min.css']
+
     @domain      = ''
     @version     = null
     @totalfiles  = 0
@@ -137,12 +140,8 @@ class Upload
             console.log 'all done!'
 
 module.exports = (dest) ->
-  defer = Q.defer()
 
   if fs.existsSync(dest)
-    new Upload(dest, -> defer.resolve())
+    new Upload(dest)
   else
-    defer.resolve()
     console.log 'something went wrong'
-
-  defer.promise

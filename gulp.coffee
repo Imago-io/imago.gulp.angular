@@ -13,13 +13,13 @@ path            = require 'path'
 modifyFilename  = require 'modify-filename'
 
 latestVersion   = require 'latest-version'
-ThemeUpload     = require './tasks/themeuploadDocker'
+ThemeUpload     = require './tasks/themeUpload'
 TemplateUpload  = require './tasks/templateUpload'
-ThemeTests      = require './tasks/themetests'
+ThemeTests      = require './tasks/themeTests'
 fs              = require 'fs'
 YAML            = require 'js-yaml'
 del             = require 'del'
-utils           = require './tasks/themeutils'
+utils           = require './tasks/themeUtils'
 pkg             = require './package.json'
 restler         = require 'restler'
 config          = require '../../gulp'
@@ -241,21 +241,17 @@ gulp.task 'build', ['compile'], ->
     .pipe plugins.gzip()
     .pipe gulp.dest config.dest
 
-gulp.task 'check-update', (cb) ->
+gulp.task 'check-update', ->
   latestVersion pkg.name, (err, version) ->
     if version isnt pkg.version
       utils.reportError({message: "There is a newer version for the imago-gulp-angular package available (#{version})."}, 'Update Available')
-    cb()
 
-gulp.task 'deploy', ['build', 'customsass'], (cb) ->
+gulp.task 'deploy', ['build', 'customsass'], ->
   gulp.start 'check-update', ->
-    ThemeUpload(config.dest, cb)
+    ThemeUpload(config.dest)
 
-gulp.task 'deploy-gae', ['build'], (cb) ->
-  ThemeUpload(config.dest, cb)
-
-gulp.task 'deploy-templates', (cb) ->
-  TemplateUpload(config.dest, cb)
+gulp.task 'deploy-templates', ->
+  TemplateUpload(config.dest)
 
 # START Custom Sass Developer
 
