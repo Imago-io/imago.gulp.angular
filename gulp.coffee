@@ -17,6 +17,7 @@ ThemeUpload     = require './tasks/themeUpload'
 TemplateUpload  = require './tasks/templateUpload'
 ThemeTests      = require './tasks/themeTests'
 fs              = require 'fs'
+crypto          = require 'crypto'
 YAML            = require 'js-yaml'
 del             = require 'del'
 utils           = require './tasks/themeUtils'
@@ -174,7 +175,7 @@ gulp.task 'watch', ->
     gulp.start('index')
 
   plugins.watch
-    glob: ['css/*.sass', "#{config.src}/**/*.sass"], emitOnGlob: false
+    glob: ['css/*.sass', "#{config.src}/**/*.sass", 'bower_components/imago/**/*.sass'], emitOnGlob: false
   , ->
     gulp.start('sass')
 
@@ -333,10 +334,17 @@ gulp.task 'rev-create', ->
   gulp.src(["#{config.dest}/**/*.min.*" ])
     .pipe plugins.rev()
     .pipe through.obj((file, enc, cb) ->
-      file.path = modifyFilename(file.revOrigPath, (name, ext) ->
-        return "#{Date.parse(new Date())}-#{name}#{ext}"
-      )
-      cb null, file
+      checksum = (str, algorithm, encoding) ->
+        return crypto
+                .createHash(algorithm || 'md5')
+                .update(str, 'utf8')
+                .digest(encoding || 'hex')
+
+      fs.readFile file.revOrigPath, (err, data) ->
+        file.path = modifyFilename(file.revOrigPath, (name, ext) ->
+          return "#{checksum(data)}-#{name}#{ext}"
+        )
+        cb null, file
       return
     )
     .pipe gulp.dest config.dest
