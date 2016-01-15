@@ -334,17 +334,17 @@ gulp.task 'rev-create', ->
   gulp.src(["#{config.dest}/**/*.min.*" ])
     .pipe plugins.rev()
     .pipe through.obj((file, enc, cb) ->
-      checksum = (str, algorithm, encoding) ->
-        return crypto
-                .createHash(algorithm || 'md5')
-                .update(str, 'utf8')
-                .digest(encoding || 'hex')
+      # checksum = (str, algorithm, encoding) ->
+      #   return crypto
+      #           .createHash(algorithm || 'md5')
+      #           .update(str, 'utf8')
+      #           .digest(encoding || 'hex')
 
-      fs.readFile file.revOrigPath, (err, data) ->
-        file.path = modifyFilename(file.revOrigPath, (name, ext) ->
-          return "#{checksum(data)}-#{name}#{ext}"
-        )
-        cb null, file
+      # fs.readFile file.revOrigPath, (err, data) ->
+      file.path = modifyFilename(file.revOrigPath, (name, ext) ->
+        return "#{config.revVersion}-#{name}#{ext}"
+      )
+      cb null, file
       return
     )
     .pipe gulp.dest config.dest

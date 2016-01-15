@@ -18,29 +18,7 @@ module.exports = (gulp, plugins) ->
 
       gulp.src config.paths.coffee
         .pipe plugins.plumber({errorHandler: utils.reportError})
-        .pipe plugins.ngClassify(
-          animation:
-            format: 'camelCase'
-            prefix: ''
-          constant:
-            format: 'camelCase'
-            prefix: ''
-          controller:
-            format: 'camelCase'
-            suffix: ''
-          factory:
-            format: 'camelCase'
-          filter:
-            format: 'camelCase'
-          provider:
-            format: 'camelCase'
-            suffix: ''
-          service:
-            format: 'camelCase'
-            suffix: ''
-          value:
-            format: 'camelCase'
-          )
+        .pipe plugins.ngClassify(config.ngClassifyConfig)
         .pipe plugins.coffee(
           bare: true
         ).on('error', utils.reportError)

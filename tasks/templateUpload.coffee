@@ -106,4 +106,3 @@ module.exports = (dest) ->
     new Upload(dest)
   else
     console.log 'something went wrong'
-    cb()
