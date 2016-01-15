@@ -33,7 +33,7 @@ gulp.task 'sass', ->
   gulp.src(config.paths.sass)
     .pipe plugins.plumber({errorHandler: utils.reportError})
     .pipe plugins.sourcemaps.init()
-    .pipe plugins.sass({indentedSyntax: true, quiet: true, outputStyle: 'compressed'})
+    .pipe plugins.sass({quiet: true, outputStyle: 'compressed'})
     .pipe plugins.autoprefixer('last 4 versions')
     .pipe plugins.concat config.targets.css
     .pipe plugins.sourcemaps.write()
@@ -49,9 +49,6 @@ gulp.task 'coffee', ->
   gulp.src config.paths.coffee
     .pipe plugins.plumber({errorHandler: utils.reportError})
     .pipe plugins.ngClassify(
-      animation:
-        format: 'camelCase'
-        prefix: ''
       constant:
         format: 'camelCase'
         prefix: ''
@@ -81,7 +78,7 @@ gulp.task 'coffee', ->
 gulp.task 'jade', ->
   gulp.src config.paths.jade
     .pipe plugins.plumber({errorHandler: utils.reportError})
-    .pipe plugins.jade({locals: {}}).on('error', utils.reportError)
+    .pipe plugins.if(/[.]jade$/, plugins.jade({locals: {}}).on('error', utils.reportError))
     .pipe plugins.angularTemplatecache(
       standalone: true
       root: "/#{config.src}/"
