@@ -22,7 +22,6 @@ YAML            = require 'js-yaml'
 del             = require 'del'
 utils           = require './tasks/themeUtils'
 pkg             = require './package.json'
-restler         = require 'restler'
 config          = require '../../gulp'
 
 yamlOpts = YAML.safeLoad(fs.readFileSync(config.dest + '/theme.yaml'))
@@ -206,6 +205,13 @@ gulp.task 'watch', ->
     glob: sources, emitOnGlob: false
   , ->
     gulp.start('combine')
+
+  plugins.watch
+    glob: 'gulp.coffee', emitOnGlob: false
+  , ->
+    delete require.cache[require.resolve('../../gulp')]
+    config = require '../../gulp'
+    gulp.start('scripts')
 
 gulp.task 'bower', (cb) ->
   exec 'bower install; bower update', (error, stdout, stderr) ->
