@@ -6,7 +6,7 @@ coffee          = require 'gulp-coffee'
 templateCache   = require 'gulp-angular-templatecache'
 concat          = require 'gulp-concat'
 karma           = require('karma').server
-utils           = require './themeutils'
+utils           = require './themeUtils'
 protractor      = require('gulp-protractor').protractor
 connect         = require 'gulp-connect'
 
