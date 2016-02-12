@@ -166,52 +166,51 @@ gulp.task 'browser-sync', ->
 
 gulp.task 'watch', ->
   plugins.util.env.envType = 'dev'
-  runSequence 'compile', 'browser-sync'
+  runSequence 'compile', 'browser-sync', ->
+    plugins.watch
+      glob: "#{config.dest}/*.jade", emitOnGlob: false
+    , ->
+      gulp.start('index')
 
-  plugins.watch
-    glob: "#{config.dest}/*.jade", emitOnGlob: false
-  , ->
-    gulp.start('index')
+    plugins.watch
+      glob: ['css/*.sass', "#{config.src}/**/*.sass", 'bower_components/imago/**/*.sass'], emitOnGlob: false
+    , ->
+      gulp.start('sass')
 
-  plugins.watch
-    glob: ['css/*.sass', "#{config.src}/**/*.sass", 'bower_components/imago/**/*.sass'], emitOnGlob: false
-  , ->
-    gulp.start('sass')
+    plugins.watch
+      glob: config.paths.libs, emitOnGlob: false
+    , ->
+      gulp.start('scripts')
 
-  plugins.watch
-    glob: config.paths.libs, emitOnGlob: false
-  , ->
-    gulp.start('scripts')
+    plugins.watch
+      glob: config.paths.jade, emitOnGlob: false
+    , ->
+      gulp.start('jade')
 
-  plugins.watch
-    glob: config.paths.jade, emitOnGlob: false
-  , ->
-    gulp.start('jade')
+    plugins.watch
+      glob: config.paths.sketch, emitOnGlob: false
+    , ->
+      gulp.start('sketch')
 
-  plugins.watch
-    glob: config.paths.sketch, emitOnGlob: false
-  , ->
-    gulp.start('sketch')
+    plugins.watch
+      glob: config.paths.coffee, emitOnGlob: false
+    , ->
+      gulp.start('coffee')
 
-  plugins.watch
-    glob: config.paths.coffee, emitOnGlob: false
-  , ->
-    gulp.start('coffee')
+    files = [config.targets.scripts, config.targets.jade, config.targets.coffee]
+    sources = ("#{config.dest}/#{file}" for file in files)
 
-  files = [config.targets.scripts, config.targets.jade, config.targets.coffee]
-  sources = ("#{config.dest}/#{file}" for file in files)
+    plugins.watch
+      glob: sources, emitOnGlob: false
+    , ->
+      gulp.start('combine')
 
-  plugins.watch
-    glob: sources, emitOnGlob: false
-  , ->
-    gulp.start('combine')
-
-  plugins.watch
-    glob: 'gulp.coffee', emitOnGlob: false
-  , ->
-    delete require.cache[require.resolve('../../gulp')]
-    config = require '../../gulp'
-    gulp.start('scripts')
+    plugins.watch
+      glob: 'gulp.coffee', emitOnGlob: false
+    , ->
+      delete require.cache[require.resolve('../../gulp')]
+      config = require '../../gulp'
+      gulp.start('scripts')
 
 gulp.task 'bower', (cb) ->
   exec 'bower install; bower update', (error, stdout, stderr) ->
