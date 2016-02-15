@@ -167,47 +167,31 @@ gulp.task 'browser-sync', ->
 gulp.task 'watch', ->
   plugins.util.env.envType = 'dev'
   runSequence 'compile', 'browser-sync', ->
-    plugins.watch
-      glob: "#{config.dest}/*.jade", emitOnGlob: false
-    , ->
+    gulp.watch "#{config.dest}/*.jade", ->
       gulp.start('index')
 
-    plugins.watch
-      glob: ['css/*.sass', "#{config.src}/**/*.sass", 'bower_components/imago/**/*.sass'], emitOnGlob: false
-    , ->
+    gulp.watch ['css/*.sass', "#{config.src}/**/*.sass", 'bower_components/imago/**/*.sass'], ->
       gulp.start('sass')
 
-    plugins.watch
-      glob: config.paths.libs, emitOnGlob: false
-    , ->
+    gulp.watch config.paths.libs, ->
       gulp.start('scripts')
 
-    plugins.watch
-      glob: config.paths.jade, emitOnGlob: false
-    , ->
+    gulp.watch config.paths.jade, ->
       gulp.start('jade')
 
-    plugins.watch
-      glob: config.paths.sketch, emitOnGlob: false
-    , ->
+    gulp.watch config.paths.sketch, ->
       gulp.start('sketch')
 
-    plugins.watch
-      glob: config.paths.coffee, emitOnGlob: false
-    , ->
+    gulp.watch config.paths.coffee, ->
       gulp.start('coffee')
 
     files = [config.targets.scripts, config.targets.jade, config.targets.coffee]
     sources = ("#{config.dest}/#{file}" for file in files)
 
-    plugins.watch
-      glob: sources, emitOnGlob: false
-    , ->
+    gulp.watch sources, ->
       gulp.start('combine')
 
-    plugins.watch
-      glob: 'gulp.coffee', emitOnGlob: false
-    , ->
+    gulp.watch 'gulp.coffee', ->
       delete require.cache[require.resolve('../../gulp')]
       config = require '../../gulp'
       gulp.start('scripts')
@@ -336,28 +320,31 @@ gulp.task 'rev-clean', ->
   del("#{config.dest}/**/*.min.*")
 
 gulp.task 'rev-create', ->
-  gulp.src(["#{config.dest}/**/*.min.*" ])
-    .pipe plugins.rev()
-    .pipe through.obj((file, enc, cb) ->
-      if config.revVersion
-        file.path = modifyFilename(file.revOrigPath, (name, ext) ->
-          return "#{config.revVersion}-#{name}#{ext}"
-        )
-      else
-        checksum = (str, algorithm, encoding) ->
-          return crypto
-                  .createHash(algorithm || 'md5')
-                  .update(str, 'utf8')
-                  .digest(encoding || 'hex')
-
-        fs.readFile file.revOrigPath, (err, data) ->
-          return "#{checksum(data)}-#{name}#{ext}"
+  gulp.src(["#{config.dest}/**/*.min.*"])
+  .pipe plugins.rev()
+  .pipe through.obj((file, enc, cb) ->
+    if config.revVersion
+      file.path = modifyFilename(file.revOrigPath, (name, ext) ->
+        return "#{config.revVersion}-#{name}#{ext}"
+      )
       cb null, file
-      return
-    )
-    .pipe gulp.dest config.dest
-    .pipe plugins.rev.manifest()
-    .pipe gulp.dest config.dest
+    else
+      checksum = (str, algorithm, encoding) ->
+        return crypto
+          .createHash(algorithm || 'md5')
+          .update(str, 'utf8')
+          .digest(encoding || 'hex')
+
+      fs.readFile file.revOrigPath, (err, data) ->
+        file.path = modifyFilename(file.revOrigPath, (name, ext) ->
+          return "#{checksum(data)}-#{name}#{ext}"
+        )
+        cb null, file
+    return
+  )
+  .pipe gulp.dest config.dest
+  .pipe plugins.rev.manifest()
+  .pipe gulp.dest config.dest
 
 gulp.task 'rev', (cb) ->
   runSequence 'rev-clean', 'build', 'rev-create', 'rev-inject', cb

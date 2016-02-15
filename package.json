@@ -1,6 +1,6 @@
 {
   "name": "imago-gulp-angular",
-  "version": "1.0.25",
+  "version": "1.0.27",
   "description": "Angular gulp for NEX9 LLC",
   "main": "./index.js",
   "scripts": {
@@ -12,7 +12,6 @@
   "dependencies": {
     "async": "*",
     "browser-sync": "~2",
-    "coffee-script": "~1",
     "connect-modrewrite": "*",
     "del": "^2.0.2",
     "gulp-angular-templatecache": "*",
@@ -36,7 +35,6 @@
     "gulp-sourcemaps": "*",
     "gulp-uglify": "*",
     "gulp-util": "*",
-    "gulp-watch": "0.7.1",
     "js-yaml": "^3.4.0",
     "karma": "^0.12.31",
     "karma-chrome-launcher": "^0.1.5",
