@@ -33,14 +33,13 @@ gulp.task 'sass', ->
   gulp.src(config.paths.sass)
     .pipe plugins.plumber({errorHandler: utils.reportError})
     .pipe plugins.sourcemaps.init()
-    .pipe plugins.sass({quiet: true, outputStyle: 'expanded'})
+    .pipe plugins.sass({quiet: true, outputStyle: 'compressed'})
     .pipe plugins.autoprefixer('last 4 versions')
     .pipe plugins.concat config.targets.css
     .pipe plugins.sourcemaps.write()
     .pipe gulp.dest config.dest
     .pipe browserSync.reload(stream: true)
     .pipe plugins.rename('application.min.css')
-    .pipe plugins.cssnano()
     .pipe gulp.dest config.dest
     .pipe plugins.gzip()
     .pipe plugins.plumber.stop()
