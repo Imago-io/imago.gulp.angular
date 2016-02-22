@@ -19,6 +19,7 @@
     "gulp-coffee": "*",
     "gulp-coffeelint": "*",
     "gulp-concat": "*",
+    "gulp-cssnano": "^2.1.1",
     "gulp-flatten": "0.0.4",
     "gulp-gzip": "^1.1.0",
     "gulp-if": "^2.0.0",
