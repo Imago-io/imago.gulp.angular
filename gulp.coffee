@@ -32,11 +32,11 @@ images = if config.targets.images then "#{config.dest}/#{config.targets.images}"
 gulp.task 'sass', ->
   gulp.src(config.paths.sass)
     .pipe plugins.plumber({errorHandler: utils.reportError})
-    .pipe plugins.sourcemaps.init()
-    .pipe plugins.sass({quiet: true, outputStyle: 'compressed'})
+    .pipe plugins.if plugins.util.env.imagoEnv isnt 'production', plugins.sourcemaps.init()
+    .pipe plugins.if plugins.util.env.imagoEnv is 'dev', plugins.sass({quiet: true, outputStyle: 'expanded'}), plugins.sass({quiet: true, outputStyle: 'compressed'})
     .pipe plugins.autoprefixer('last 4 versions')
     .pipe plugins.concat config.targets.css
-    .pipe plugins.sourcemaps.write()
+    .pipe plugins.if plugins.util.env.imagoEnv isnt 'production', plugins.sourcemaps.write()
     .pipe gulp.dest config.dest
     .pipe browserSync.reload(stream: true)
     .pipe plugins.rename('application.min.css')
@@ -108,7 +108,7 @@ gulp.task 'scripts', ->
 
 gulp.task 'index', ->
   return unless config.paths.index
-  if plugins.util.env.envType is 'dev'
+  if plugins.util.env.imagoEnv is 'dev'
     YamlHeader = '<script type="text/javascript">window.yaml = ' +
             JSON.stringify(yamlOpts) +
             '</script>'
@@ -122,7 +122,7 @@ gulp.task 'index', ->
       pretty: true
       ).on('error', utils.reportError)
 
-    .pipe(plugins.if(plugins.util.env.envType is 'dev', plugins.injectString.after('<head>', YamlHeader)))
+    .pipe(plugins.if(plugins.util.env.imagoEnv is 'dev', plugins.injectString.after('<head>', YamlHeader)))
     .pipe gulp.dest config.dest
 
 gulp.task 'combine', ->
@@ -137,9 +137,9 @@ gulp.task 'combine', ->
   sources = files.map (file) -> "#{config.dest}/#{file}"
 
   gulp.src sources
-    .pipe plugins.sourcemaps.init()
+    .pipe plugins.if plugins.util.env.imagoEnv isnt 'production', plugins.sourcemaps.init()
     .pipe plugins.concat config.targets.js
-    .pipe plugins.sourcemaps.write "./maps"
+    .pipe plugins.if plugins.util.env.imagoEnv isnt 'production', plugins.sourcemaps.write "./maps"
     .pipe gulp.dest config.dest
     .pipe browserSync.reload(stream:true)
 
@@ -165,7 +165,7 @@ gulp.task 'browser-sync', ->
   browserSync.init ["#{config.dest}/index.html"], options
 
 gulp.task 'watch', ->
-  plugins.util.env.envType = 'dev'
+  plugins.util.env.imagoEnv = 'dev'
   runSequence 'compile', 'browser-sync', ->
     gulp.watch "#{config.dest}/*.jade", ->
       gulp.start('index')
@@ -179,8 +179,9 @@ gulp.task 'watch', ->
     gulp.watch config.paths.jade, ->
       gulp.start('jade')
 
-    gulp.watch config.paths.sketch, ->
-      gulp.start('sketch')
+    if config.paths.sketch
+      gulp.watch config.paths.sketch, ->
+        gulp.start('sketch')
 
     gulp.watch config.paths.coffee, ->
       gulp.start('coffee')
@@ -212,21 +213,24 @@ gulp.task 'import-imago', ->
   gulp.src('bower_components/imago/**/fonts/*.*')
     .pipe(plugins.flatten())
     .pipe(gulp.dest(fonts))
-  gulp.src('bower_components/imago/css/images/*.*')
+  gulp.src('bower_components/imago/**/images/*.*')
     .pipe(plugins.flatten())
     .pipe(gulp.dest(images))
 
 gulp.task 'update', ['npm', 'bower'], (cb) ->
   runSequence 'import-imago', cb
 
-gulp.task 'build', ['compile'], ->
-  gulp.src "#{config.dest}/#{config.targets.js}"
-    .pipe plugins.uglify
-      mangle: false
-    .pipe plugins.rename('application.min.js')
-    .pipe gulp.dest config.dest
-    .pipe plugins.gzip()
-    .pipe gulp.dest config.dest
+gulp.task 'build', (cb) ->
+  plugins.util.env.imagoEnv = 'production'
+  runSequence 'compile', ->
+    gulp.src "#{config.dest}/#{config.targets.js}"
+      .pipe plugins.uglify
+        mangle: false
+      .pipe plugins.rename('application.min.js')
+      .pipe gulp.dest config.dest
+      .pipe plugins.gzip()
+      .pipe gulp.dest config.dest
+      .on 'end', cb
 
 gulp.task 'check-update', ->
   latestVersion pkg.name, (err, version) ->
