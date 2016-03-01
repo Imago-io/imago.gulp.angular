@@ -26,9 +26,6 @@ config          = require '../../gulp'
 
 yamlOpts = YAML.safeLoad(fs.readFileSync(config.dest + '/theme.yaml'))
 
-fonts  = if config.targets.fonts then "#{config.dest}/#{config.targets.fonts}" else "#{config.dest}/i/fonts"
-images = if config.targets.images then "#{config.dest}/#{config.targets.images}" else "#{config.dest}/i"
-
 gulp.task 'sass', ->
   gulp.src(config.paths.sass)
     .pipe plugins.plumber({errorHandler: utils.reportError})
@@ -166,7 +163,7 @@ gulp.task 'browser-sync', ->
 
 gulp.task 'watch', ->
   plugins.util.env.imagoEnv = 'dev'
-  runSequence 'compile', 'browser-sync', ->
+  runSequence 'import-assets', 'compile', 'browser-sync', ->
     gulp.watch "#{config.dest}/*.jade", ->
       gulp.start('index')
 
@@ -198,31 +195,33 @@ gulp.task 'watch', ->
       gulp.start('scripts')
 
 gulp.task 'bower', (cb) ->
-  exec 'bower install; bower update', (error, stdout, stderr) ->
+  exec 'bower install; bower update', (err, stdout, stderr) ->
     console.log 'result: ' + stdout
-    console.log 'exec error: ' + error if error isnt null
+    console.log 'exec error: ' + err if err
     cb()
 
 gulp.task 'npm', (cb) ->
   exec 'npm update', (error, stdout, stderr) ->
     console.log 'result: ' + stdout
-    console.log 'exec error: ' + error if error isnt null
+    console.log 'exec error: ' + err if err
     cb()
 
-gulp.task 'import-imago', ->
-  gulp.src('bower_components/imago/**/fonts/*.*')
-    .pipe(plugins.flatten())
-    .pipe(gulp.dest(fonts))
-  gulp.src('bower_components/imago/**/images/*.*')
-    .pipe(plugins.flatten())
-    .pipe(gulp.dest(images))
+gulp.task 'import-assets', (cb) ->
+  return cb() unless config.paths.importAssets
+  for item in config.paths.importAssets
+    continue unless _.isPlainObject item
+    gulp.src(item.src)
+      .pipe(plugins.flatten())
+      .pipe(gulp.dest(item.dest))
+
+  cb()
 
 gulp.task 'update', ['npm', 'bower'], (cb) ->
-  runSequence 'import-imago', cb
+  cb()
 
 gulp.task 'build', (cb) ->
   plugins.util.env.imagoEnv = 'production'
-  runSequence 'compile', ->
+  runSequence 'import-assets', 'compile', ->
     gulp.src "#{config.dest}/#{config.targets.js}"
       .pipe plugins.uglify
         mangle: false

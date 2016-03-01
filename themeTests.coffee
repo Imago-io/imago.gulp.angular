@@ -20,7 +20,6 @@ module.exports =
       if e.code is 'ENOENT'
         fs.mkdirSync(config.tempTests)
 
-    YOUR_LOCALS = {}
     gulp.src config.paths.coffee
       .pipe plumber(
         errorHandler: utils.reportError
@@ -57,7 +56,7 @@ module.exports =
       .pipe plumber(
         errorHandler: utils.reportError
       )
-      .pipe jade({locals: YOUR_LOCALS}).on('error', utils.reportError)
+      .pipe jade({locals: {}}).on('error', utils.reportError)
       .pipe templateCache(
         standalone: true
         root: "/imagoWidgets/"
