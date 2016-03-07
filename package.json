@@ -42,7 +42,6 @@
     "karma-firefox-launcher": "*",
     "karma-ie-launcher": "*",
     "karma-jasmine": "*",
-    "karma-phantomjs-launcher": "*",
     "karma-safari-launcher": "*",
     "latest-version": "^1.0.1",
     "lodash": "^3.10.1",
