@@ -15,9 +15,16 @@ class Upload
     @callback    = callback
     @inpath      = inpath
     @opts        = {}
-    @exclude     = ['theme.yaml', 'index.html', 'application.js.map', \
-                    'application.js', 'scripts.js', 'templates.js', \
-                    'coffee.js', 'application.min.js', 'application.min.css']
+
+    @exclude     = ['theme.yaml', 
+                    'index.html', 
+                    'application.js.map',
+                    'application.js', 
+                    'scripts.js', 
+                    'templates.js',
+                    'coffee.js', 
+                    'application.min.js', 
+                    'application.min.css']
 
     @domain      = ''
     @version     = null
@@ -52,7 +59,7 @@ class Upload
 
     opts =
       headers: {
-        Authorization: "Basic #{new Buffer("#{@opts.apikey}:").toString('base64')}"
+        Authorization: "Basic #{@opts.apikey}:"
       }
 
     restler.postJson(url, {'_tenant': @opts.tenant}, opts).on 'complete', (data, response) =>
@@ -96,7 +103,7 @@ class Upload
 
           opts =
             headers: {
-              Authorization: "Basic #{new Buffer("#{_this.opts.apikey}:").toString('base64')}"
+              Authorization: "Basic #{_this.opts.apikey}:"
             }
 
           requestUrl = (retries = 0) =>
