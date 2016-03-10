@@ -40,7 +40,7 @@ class Upload
   clearTemplates: (cb) ->
     opts =
       headers: {
-        Authorization: "Basic #{new Buffer("#{@opts.apikey}:").toString('base64')}"
+        Authorization: "Basic #{@opts.apikey}:"
       }
     restler.del(@endpoint, opts).on 'complete', -> cb()
 
@@ -56,7 +56,7 @@ class Upload
     # console.log 'apikey', @opts.apikey
     opts =
       headers: {
-        Authorization: "Basic #{new Buffer("#{@opts.apikey}:").toString('base64')}"
+        Authorization: "Basic #{@opts.apikey}:"
       }
 
     restler.postJson(@endpoint, templateObj, opts).on 'complete', (data, response) ->
