@@ -308,6 +308,10 @@ replaceIndex = (replacement) ->
       src = file.contents.toString('utf8')
       changes.forEach (change) =>
         for key, value of change
+          if config.paths.cdn
+            env = plugins.util.env?.env or 'default'
+            key = "/#{key}"
+            value = "#{config.paths.cdn[env]}#{value}"
           key = key.replace replacement, ''
           src = src.replace(key, value)
       file.contents = new Buffer(src)

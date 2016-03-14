@@ -1,7 +1,7 @@
 fs              = require 'fs'
 karma           = require('karma').server
 protractor      = require('gulp-protractor').protractor
-utils           = require './themeutils'
+utils           = require './themeUtils'
 
 module.exports = (gulp, plugins) ->
 
