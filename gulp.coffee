@@ -84,8 +84,8 @@ gulp.task 'jade', ->
     .pipe plugins.concat config.targets.jade
     .pipe gulp.dest config.dest
 
-gulp.task 'sketch', ->
-  return unless config.paths.sketch
+gulp.task 'sketch', (cb) ->
+  return cb() unless config.paths.sketch
   gulp.src config.paths.sketch
     .pipe plugins.plumber({errorHandler: utils.reportError})
     .pipe plugins.sketch(
@@ -143,7 +143,7 @@ gulp.task 'combine', ->
 gulp.task 'js', ['scripts', 'coffee', 'jade'], (next) ->
   next()
 
-gulp.task 'compile', ['index', 'sass', 'js', 'sketch'], (cb) ->
+gulp.task 'compile', ['index', 'sass', 'js'], (cb) ->
   runSequence 'combine', cb
 
 gulp.task 'browser-sync', ->
@@ -175,10 +175,6 @@ gulp.task 'watch', ->
 
     gulp.watch config.paths.jade, ->
       gulp.start('jade')
-
-    if config.paths.sketch
-      gulp.watch config.paths.sketch, ->
-        gulp.start('sketch')
 
     gulp.watch config.paths.coffee, ->
       gulp.start('coffee')
@@ -231,7 +227,6 @@ gulp.task 'minify', ->
 gulp.task 'build', (cb) ->
   plugins.util.env.imagoEnv = 'production'
   runSequence 'import-assets', 'compile', 'minify', cb
-
 
 gulp.task 'check-update', ->
   latestVersion pkg.name, (err, version) ->
