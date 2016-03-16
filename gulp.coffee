@@ -219,17 +219,19 @@ gulp.task 'import-assets', (cb) ->
 gulp.task 'update', ['npm', 'bower'], (cb) ->
   cb()
 
+gulp.task 'minify', ->
+  gulp.src "#{config.dest}/#{config.targets.js}"
+    .pipe plugins.uglify
+      mangle: false
+    .pipe plugins.rename('application.min.js')
+    .pipe gulp.dest config.dest
+    .pipe plugins.gzip()
+    .pipe gulp.dest config.dest
+
 gulp.task 'build', (cb) ->
   plugins.util.env.imagoEnv = 'production'
-  runSequence 'import-assets', 'compile', ->
-    gulp.src "#{config.dest}/#{config.targets.js}"
-      .pipe plugins.uglify
-        mangle: false
-      .pipe plugins.rename('application.min.js')
-      .pipe gulp.dest config.dest
-      .pipe plugins.gzip()
-      .pipe gulp.dest config.dest
-      .on 'end', cb
+  runSequence 'import-assets', 'compile', 'minify', cb
+
 
 gulp.task 'check-update', ->
   latestVersion pkg.name, (err, version) ->
