@@ -176,6 +176,10 @@ gulp.task 'watch', ->
     gulp.watch config.paths.jade, ->
       gulp.start('jade')
 
+    if config.paths.sketch
+      gulp.watch config.paths.sketch, ->
+        gulp.start('sketch')
+
     gulp.watch config.paths.coffee, ->
       gulp.start('coffee')
 
