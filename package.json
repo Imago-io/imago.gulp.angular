@@ -1,6 +1,6 @@
 {
   "name": "imago-gulp-angular",
-  "version": "1.0.36",
+  "version": "1.0.37",
   "description": "Angular gulp for NEX9 LLC",
   "main": "./index.js",
   "scripts": {
@@ -61,7 +61,7 @@
   "private": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/Nex9/imago.gulp.angular"
+    "url": "https://github.com/Imago-io/imago.gulp.angular"
   },
   "_id": "imago-gulp-angular@0.0.5",
   "_from": "imago-gulp-angular@~0.0.5",
