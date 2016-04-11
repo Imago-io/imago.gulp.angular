@@ -2,7 +2,6 @@ fs      = require 'fs'
 restler = require 'restler'
 request = require 'request'
 walk    = require 'walkdir'
-YAML    = require 'js-yaml'
 mime    = require 'mime'
 md5     = require 'md5'
 pathMod = require 'path'
@@ -10,20 +9,23 @@ async   = require 'async'
 
 class Upload
 
-  constructor: (inpath, callback) ->
+  constructor: (config, callback) ->
 
     @callback    = callback
-    @inpath      = inpath
-    @opts        = {}
+    @inpath      = config.dest
+    @opts        =
+      apikey     : config.setup.apikey
+      tenant     : config.setup.tenant
+      setdefault : config.setup.setDefault
 
-    @exclude     = ['theme.yaml', 
-                    'index.html', 
+    @exclude     = ['theme.yaml',
+                    'index.html',
                     'application.js.map',
-                    'application.js', 
-                    'scripts.js', 
+                    'application.js',
+                    'scripts.js',
                     'templates.js',
-                    'coffee.js', 
-                    'application.min.js', 
+                    'coffee.js',
+                    'application.min.js',
                     'application.min.css']
 
     @domain      = ''
@@ -37,7 +39,6 @@ class Upload
 
   run: ->
     console.log 'getting configuration...'
-    @parseYaml()
     @getDomain()
     console.log 'domain is', @domain
     console.log 'opts', @opts
@@ -48,11 +49,6 @@ class Upload
     if @opts.tenant in ['-admin-', '-account-']
       @domain = 'https://imago.imago.io'
     @domain = 'http://localhost:8001' if @opts.debug
-
-  parseYaml: =>
-    yamlPath = @inpath+'/theme.yaml'
-    process.kill() unless fs.existsSync yamlPath
-    @opts = YAML.safeLoad(fs.readFileSync(yamlPath))
 
   getNextVersion: ->
     url = @domain + '/api/nextversion'
@@ -146,9 +142,9 @@ class Upload
           restler.postJson(url, data).on 'complete', (data, response) ->
             console.log 'all done!'
 
-module.exports = (dest) ->
+module.exports = (config) ->
 
-  if fs.existsSync(dest)
-    new Upload(dest)
+  if fs.existsSync(config.dest)
+    new Upload(config)
   else
     console.log 'something went wrong'

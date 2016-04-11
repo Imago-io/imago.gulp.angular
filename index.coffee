@@ -1,116 +1,118 @@
-gulp            = require 'gulp'
-plugins         = require('gulp-load-plugins')()
-browserSync     = require 'browser-sync'
+gulp                = require 'gulp'
+plugins             = require('gulp-load-plugins')()
+browserSync         = require 'browser-sync'
 
-runSequence     = require 'run-sequence'
+runSequence         = require 'run-sequence'
 
-modRewrite      = require 'connect-modrewrite'
-exec            = require('child_process').exec
+modRewrite          = require 'connect-modrewrite'
+exec                = require('child_process').exec
 
-_               = require 'lodash'
-through         = require 'through2'
-path            = require 'path'
-modifyFilename  = require 'modify-filename'
+_                   = require 'lodash'
+through             = require 'through2'
+path                = require 'path'
+modifyFilename      = require 'modify-filename'
 
-latestVersion   = require 'latest-version'
-ThemeUpload     = require './tasks/themeUpload'
-TemplateUpload  = require './tasks/templateUpload'
-ThemeTests      = require './tasks/themeTests'
-fs              = require 'fs'
-crypto          = require 'crypto'
-YAML            = require 'js-yaml'
-del             = require 'del'
-utils           = require './tasks/themeUtils'
-pkg             = require './package.json'
-config          = require '../../gulp'
+latestVersion       = require 'latest-version'
+fs                  = require 'fs'
+crypto              = require 'crypto'
+del                 = require 'del'
+utils               = require './tasks/themeUtils'
+ThemeUpload         = require './tasks/themeUpload'
+TemplateUpload      = require './tasks/templateUpload'
+ThemeTests          = require './tasks/themeTests'
+pkg                 = require './package.json'
+imagoConfigPath     = path.resolve(process.cwd(), './gulp.coffee')
+imagoConfig         = require imagoConfigPath
 
-yamlOpts = YAML.safeLoad(fs.readFileSync(config.dest + '/theme.yaml'))
+opts =
+  ngClassify:
+    constant:
+      format: 'camelCase'
+      prefix: ''
+    controller:
+      format: 'camelCase'
+      suffix: ''
+    factory:
+      format: 'camelCase'
+    filter:
+      format: 'camelCase'
+    provider:
+      format: 'camelCase'
+      suffix: ''
+    service:
+      format: 'camelCase'
+      suffix: ''
+    value:
+      format: 'camelCase'
 
 gulp.task 'sass', ->
-  gulp.src(config.paths.sass)
+  gulp.src(imagoConfig.paths.sass)
     .pipe plugins.plumber({errorHandler: utils.reportError})
     .pipe plugins.if plugins.util.env.imagoEnv isnt 'production', plugins.sourcemaps.init()
     .pipe plugins.if plugins.util.env.imagoEnv is 'dev', plugins.sass({quiet: true, outputStyle: 'expanded'}), plugins.sass({quiet: true, outputStyle: 'compressed'})
     .pipe plugins.autoprefixer('last 4 versions')
-    .pipe plugins.concat config.targets.css
+    .pipe plugins.concat imagoConfig.targets.css
     .pipe plugins.if plugins.util.env.imagoEnv isnt 'production', plugins.sourcemaps.write()
-    .pipe gulp.dest config.dest
+    .pipe gulp.dest imagoConfig.dest
     .pipe browserSync.reload(stream: true)
     .pipe plugins.rename('application.min.css')
-    .pipe gulp.dest config.dest
+    .pipe gulp.dest imagoConfig.dest
     .pipe plugins.gzip()
     .pipe plugins.plumber.stop()
-    .pipe gulp.dest config.dest
+    .pipe gulp.dest imagoConfig.dest
 
 gulp.task 'coffee', ->
-  gulp.src config.paths.coffee
+  gulp.src imagoConfig.paths.coffee
     .pipe plugins.plumber({errorHandler: utils.reportError})
-    .pipe plugins.ngClassify(
-      constant:
-        format: 'camelCase'
-        prefix: ''
-      controller:
-        format: 'camelCase'
-        suffix: ''
-      factory:
-        format: 'camelCase'
-      filter:
-        format: 'camelCase'
-      provider:
-        format: 'camelCase'
-        suffix: ''
-      service:
-        format: 'camelCase'
-        suffix: ''
-      value:
-        format: 'camelCase'
-      )
+    .pipe plugins.ngClassify(opts.ngClassify)
     .pipe plugins.coffee(
       bare: true
     ).on('error', utils.reportError)
     .pipe plugins.coffeelint()
-    .pipe plugins.concat config.targets.coffee
-    .pipe gulp.dest config.dest
+    .pipe plugins.concat imagoConfig.targets.coffee
+    .pipe gulp.dest imagoConfig.dest
 
 gulp.task 'jade', ->
-  gulp.src config.paths.jade
+  gulp.src imagoConfig.paths.jade
     .pipe plugins.plumber({errorHandler: utils.reportError})
     .pipe plugins.if(/[.]jade$/, plugins.jade({locals: {}}).on('error', utils.reportError))
     .pipe plugins.angularTemplatecache(
       standalone: true
-      root: "/#{config.src}/"
+      root: "/#{imagoConfig.src}/"
       module: 'templatesApp'
     )
-    .pipe plugins.concat config.targets.jade
-    .pipe gulp.dest config.dest
+    .pipe plugins.concat imagoConfig.targets.jade
+    .pipe gulp.dest imagoConfig.dest
 
 gulp.task 'sketch', (cb) ->
-  return cb() unless config.paths.sketch
-  gulp.src config.paths.sketch
+  return cb() unless imagoConfig.paths.sketch
+  gulp.src imagoConfig.paths.sketch
     .pipe plugins.plumber({errorHandler: utils.reportError})
     .pipe plugins.sketch(
       export: 'artboards'
       saveForWeb: true
       trimmed: false)
-    .pipe gulp.dest "#{config.dest}/i"
+    .pipe gulp.dest "#{imagoConfig.dest}/i"
 
 gulp.task 'scripts', ->
   env = plugins.util.env?.env or 'default'
-  if _.isArray config.paths.envSpecJs?[env]
-    config.paths.libs = config.paths.envSpecJs[env].concat config.paths.libs
-  gulp.src config.paths.libs
+  if _.isArray imagoConfig.paths.envSpecJs?[env]
+    imagoConfig.paths.libs = imagoConfig.paths.envSpecJs[env].concat imagoConfig.paths.libs
+  gulp.src imagoConfig.paths.libs
     .pipe plugins.plumber({errorHandler: utils.reportError})
-    .pipe plugins.concat config.targets.scripts
-    .pipe gulp.dest config.dest
+    .pipe plugins.concat imagoConfig.targets.scripts
+    .pipe gulp.dest imagoConfig.dest
 
 gulp.task 'index', ->
-  return unless config.paths.index
+  return unless imagoConfig.paths.index
+  browser =
+    apiKey: imagoConfig.setup.apiKey
   if plugins.util.env.imagoEnv is 'dev'
-    YamlHeader = '<script type="text/javascript">window.yaml = ' +
-            JSON.stringify(yamlOpts) +
+    imagoSettingsHeader = '<script type="text/javascript">window.imagoSettings = ' +
+            JSON.stringify(browser) +
             '</script>'
 
-  gulp.src config.paths.index
+  gulp.src imagoConfig.paths.index
     .pipe plugins.plumber(
       errorHandler: utils.reportError
     )
@@ -119,25 +121,25 @@ gulp.task 'index', ->
       pretty: true
       ).on('error', utils.reportError)
 
-    .pipe(plugins.if(plugins.util.env.imagoEnv is 'dev', plugins.injectString.after('<head>', YamlHeader)))
-    .pipe gulp.dest config.dest
+    .pipe(plugins.if(plugins.util.env.imagoEnv is 'dev', plugins.injectString.after('<head>', imagoSettingsHeader)))
+    .pipe gulp.dest imagoConfig.dest
 
 gulp.task 'combine', ->
   rethrow = (err, filename, lineno) -> throw err
 
   files = [
-    config.targets.scripts
-    config.targets.coffee
-    config.targets.jade
+    imagoConfig.targets.scripts
+    imagoConfig.targets.coffee
+    imagoConfig.targets.jade
   ]
 
-  sources = files.map (file) -> "#{config.dest}/#{file}"
+  sources = files.map (file) -> "#{imagoConfig.dest}/#{file}"
 
   gulp.src sources
     .pipe plugins.if plugins.util.env.imagoEnv isnt 'production', plugins.sourcemaps.init()
-    .pipe plugins.concat config.targets.js
+    .pipe plugins.concat imagoConfig.targets.js
     .pipe plugins.if plugins.util.env.imagoEnv isnt 'production', plugins.sourcemaps.write "./maps"
-    .pipe gulp.dest config.dest
+    .pipe gulp.dest imagoConfig.dest
     .pipe browserSync.reload(stream:true)
 
 gulp.task 'js', ['scripts', 'coffee', 'jade'], (next) ->
@@ -149,49 +151,49 @@ gulp.task 'compile', ['index', 'sass', 'js'], (cb) ->
 gulp.task 'browser-sync', ->
   options =
     server:
-      baseDir: "#{config.dest}"
+      baseDir: "#{imagoConfig.dest}"
       middleware: [
         modRewrite ['^([^\\.]+)(\\?.+)?$ /index.html [L]']
       ]
     debugInfo: false
     notify: false
 
-  if _.isPlainObject config.browserSync
-    _.assign options, config.browserSync
+  if _.isPlainObject imagoConfig.browserSync
+    _.assign options, imagoConfig.browserSync
 
-  browserSync.init ["#{config.dest}/index.html"], options
+  browserSync.init ["#{imagoConfig.dest}/index.html"], options
 
 gulp.task 'watch', ->
   plugins.util.env.imagoEnv = 'dev'
   runSequence 'import-assets', 'compile', 'browser-sync', ->
-    gulp.watch "#{config.dest}/*.jade", ->
+    gulp.watch "#{imagoConfig.dest}/*.jade", ->
       gulp.start('index')
 
-    gulp.watch ['css/*.sass', "#{config.src}/**/*.sass", 'bower_components/imago/**/*.sass'], ->
+    gulp.watch ['css/*.sass', "#{imagoConfig.src}/**/*.sass", 'bower_components/imago/**/*.sass'], ->
       gulp.start('sass')
 
-    gulp.watch config.paths.libs, ->
+    gulp.watch imagoConfig.paths.libs, ->
       gulp.start('scripts')
 
-    gulp.watch config.paths.jade, ->
+    gulp.watch imagoConfig.paths.jade, ->
       gulp.start('jade')
 
-    if config.paths.sketch
-      gulp.watch config.paths.sketch, ->
+    if imagoConfig.paths.sketch
+      gulp.watch imagoConfig.paths.sketch, ->
         gulp.start('sketch')
 
-    gulp.watch config.paths.coffee, ->
+    gulp.watch imagoConfig.paths.coffee, ->
       gulp.start('coffee')
 
-    files = [config.targets.scripts, config.targets.jade, config.targets.coffee]
-    sources = ("#{config.dest}/#{file}" for file in files)
+    files = [imagoConfig.targets.scripts, imagoConfig.targets.jade, imagoConfig.targets.coffee]
+    sources = ("#{imagoConfig.dest}/#{file}" for file in files)
 
     gulp.watch sources, ->
       gulp.start('combine')
 
-    gulp.watch 'gulp.coffee', ->
-      delete require.cache[require.resolve('../../gulp')]
-      config = require '../../gulp'
+    gulp.watch imagoConfigPath, ->
+      delete require.cache[require.resolve(imagoConfigPath)]
+      imagoConfig = require imagoConfigPath
       gulp.start('scripts')
 
 gulp.task 'bower', (cb) ->
@@ -207,8 +209,8 @@ gulp.task 'npm', (cb) ->
     cb()
 
 gulp.task 'import-assets', (cb) ->
-  return cb() unless config.paths.importAssets
-  for item in config.paths.importAssets
+  return cb() unless imagoConfig.paths.importAssets
+  for item in imagoConfig.paths.importAssets
     continue unless _.isPlainObject item
     gulp.src(item.src)
       .pipe(plugins.flatten())
@@ -220,13 +222,13 @@ gulp.task 'update', ['npm', 'bower'], (cb) ->
   cb()
 
 gulp.task 'minify', ->
-  gulp.src "#{config.dest}/#{config.targets.js}"
+  gulp.src "#{imagoConfig.dest}/#{imagoConfig.targets.js}"
     .pipe plugins.uglify
       mangle: false
     .pipe plugins.rename('application.min.js')
-    .pipe gulp.dest config.dest
+    .pipe gulp.dest imagoConfig.dest
     .pipe plugins.gzip()
-    .pipe gulp.dest config.dest
+    .pipe gulp.dest imagoConfig.dest
 
 gulp.task 'build', (cb) ->
   plugins.util.env.imagoEnv = 'production'
@@ -239,45 +241,45 @@ gulp.task 'check-update', ->
 
 gulp.task 'deploy', ['build', 'customsass'], ->
   gulp.start 'check-update', ->
-    ThemeUpload(config.dest)
+    ThemeUpload(imagoConfig)
 
 gulp.task 'deploy-templates', ->
-  TemplateUpload(config.dest)
+  TemplateUpload(imagoConfig)
 
 # START Custom Sass Developer
 
 gulp.task 'customsass', ->
-  return 'no path for customSass found' unless config.paths.customSass
-  gulp.src(config.paths.customSass)
+  return 'no path for customSass found' unless imagoConfig.paths.customSass
+  gulp.src(imagoConfig.paths.customSass)
     .pipe plugins.plumber({errorHandler: utils.reportError})
     .pipe plugins.sourcemaps.init()
     .pipe plugins.sass({indentedSyntax: true, quiet: true})
     .pipe plugins.autoprefixer('last 4 versions')
-    .pipe plugins.concat config.targets.customCss
+    .pipe plugins.concat imagoConfig.targets.customCss
     .pipe plugins.sourcemaps.write()
-    .pipe gulp.dest config.dest
+    .pipe gulp.dest imagoConfig.dest
     .pipe browserSync.reload(stream: true)
     .pipe plugins.rename('custom.min.css')
     .pipe plugins.gzip()
     .pipe plugins.plumber.stop()
-    .pipe gulp.dest config.dest
+    .pipe gulp.dest imagoConfig.dest
 
 gulp.task 'watch-customsass', ->
-  return 'no path for customSass found' unless config.paths.customSass
+  return 'no path for customSass found' unless imagoConfig.paths.customSass
   options =
-    files: ["#{config.dest}/#{config.targets.customCss}"]
+    files: ["#{imagoConfig.dest}/#{imagoConfig.targets.customCss}"]
     proxy: "https://#{yamlOpts.tenant}.imago.io/account/checkout/--ID--",
-    serveStatic: [config.dest]
+    serveStatic: [imagoConfig.dest]
     rewriteRules: [
       {
         match: /(latest\/custom\.min\.css)/
         fn: (match) ->
-          return config.targets.customCss
+          return imagoConfig.targets.customCss
       }
     ]
 
   browserSync.init options
-  gulp.watch(config.paths.customSass, ['customsass'])
+  gulp.watch(imagoConfig.paths.customSass, ['customsass'])
 
 # END Custom Sass Developer
 
@@ -309,10 +311,10 @@ replaceIndex = (replacement) ->
       src = file.contents.toString('utf8')
       changes.forEach (change) =>
         for key, value of change
-          if config.paths.cdn
+          if imagoConfig.paths.cdn
             env = plugins.util.env?.env or 'default'
             key = "/#{key}"
-            value = "#{config.paths.cdn[env]}#{value}"
+            value = "#{imagoConfig.paths.cdn[env]}#{value}"
           key = key.replace replacement, ''
           src = src.replace(key, value)
       file.contents = new Buffer(src)
@@ -320,20 +322,20 @@ replaceIndex = (replacement) ->
     cb()
 
 gulp.task 'rev-inject', (cb) ->
-  gulp.src(["#{config.dest}/*.json", "#{config.dest}/*.html"])
+  gulp.src(["#{imagoConfig.dest}/*.json", "#{imagoConfig.dest}/*.html"])
     .pipe replaceIndex('.min')
-    .pipe gulp.dest config.dest
+    .pipe gulp.dest imagoConfig.dest
 
 gulp.task 'rev-clean', ->
-  del("#{config.dest}/**/*.min.*")
+  del("#{imagoConfig.dest}/**/*.min.*")
 
 gulp.task 'rev-create', ->
-  gulp.src(["#{config.dest}/**/*.min.*"])
+  gulp.src(["#{imagoConfig.dest}/**/*.min.*"])
   .pipe plugins.rev()
   .pipe through.obj((file, enc, cb) ->
-    if config.revVersion
+    if imagoConfig.revVersion
       file.path = modifyFilename(file.revOrigPath, (name, ext) ->
-        return "#{config.revVersion}-#{name}#{ext}"
+        return "#{imagoConfig.revVersion}-#{name}#{ext}"
       )
       cb null, file
     else
@@ -350,9 +352,9 @@ gulp.task 'rev-create', ->
         cb null, file
     return
   )
-  .pipe gulp.dest config.dest
+  .pipe gulp.dest imagoConfig.dest
   .pipe plugins.rev.manifest()
-  .pipe gulp.dest config.dest
+  .pipe gulp.dest imagoConfig.dest
 
 gulp.task 'rev', (cb) ->
   runSequence 'rev-clean', 'build', 'rev-create', 'rev-inject', cb

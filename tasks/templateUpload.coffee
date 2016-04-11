@@ -1,17 +1,19 @@
 fs      = require 'fs'
 restler = require 'restler'
 walk    = require 'walkdir'
-YAML    = require 'js-yaml'
 sass    = require 'node-sass'
 pathMod = require 'path'
 async   = require 'async'
 
 class Upload
 
-  constructor: (inpath) ->
+  constructor: (config) ->
 
-    @inpath      = inpath
-    @opts        = {}
+    @inpath      = config.dest
+    @opts        =
+      apikey     : config.setup.apikey
+      tenant     : config.setup.tenant
+      setdefault : config.setup.setDefault
     @domain      = ''
     console.log 'this inpath', @inpath
 
@@ -19,7 +21,6 @@ class Upload
 
   run: ->
     console.log 'getting configuration...'
-    @parseYaml()
     @getDomain()
     # console.log 'domain is', @domain
     # console.log 'opts', @opts
@@ -29,13 +30,6 @@ class Upload
     @domain   = "https://api.imago.io"
     @domain   = 'http://localhost:8000' if @opts.debug
     @endpoint = "#{@domain}/v1/templates"
-
-
-  parseYaml: =>
-    yamlPath = @inpath+'/theme.yaml'
-    process.kill() unless fs.existsSync yamlPath
-    @opts = YAML.safeLoad(fs.readFileSync(yamlPath))
-
 
   clearTemplates: (cb) ->
     opts =
@@ -101,8 +95,9 @@ class Upload
       (err) =>
         console.log 'done uploading templates...'
 
-module.exports = (dest) ->
-  if fs.existsSync(dest)
-    new Upload(dest)
+module.exports = (config) ->
+
+  if fs.existsSync(config.dest)
+    new Upload(config)
   else
     console.log 'something went wrong'

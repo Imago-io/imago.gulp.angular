@@ -1,7 +1,7 @@
 {
   "name": "imago-gulp-angular",
   "version": "1.0.37",
-  "description": "Angular gulp for NEX9 LLC",
+  "description": "AngularJs tools | Imago.io",
   "main": "./index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -35,7 +35,6 @@
     "gulp-sourcemaps": "*",
     "gulp-uglify": "*",
     "gulp-util": "*",
-    "js-yaml": "^3.4.0",
     "karma": "*",
     "karma-chrome-launcher": "*",
     "karma-coffee-preprocessor": "*",
@@ -49,7 +48,7 @@
     "mime": "*",
     "modify-filename": "^1.1.0",
     "node-notifier": "*",
-    "path": "^0.12.7",
+    "path": "*",
     "protractor": "*",
     "request": "*",
     "restler": "*",

@@ -1,2 +1,4 @@
+#!/usr/bin/env node
+
 require('coffee-script/register');
-module.exports = require('./gulp.coffee');
+module.exports = require('./index.coffee');
