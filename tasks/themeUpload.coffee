@@ -16,7 +16,7 @@ class Upload
     @opts        =
       apikey     : config.setup.apikey
       tenant     : config.setup.tenant
-      setdefault : config.setup.setDefault
+      setdefault : config.setup.setdefault
 
     @exclude     = ['theme.yaml',
                     'index.html',
@@ -139,12 +139,16 @@ class Upload
           data =
             version: _this.version
             _tenant: _this.opts.tenant
-          restler.postJson(url, data).on 'complete', (data, response) ->
+          restler.postJson(url, data).on 'complete', (data, response) =>
             console.log 'all done!'
+            @callback()
+        else
+          @callback()
 
-module.exports = (config) ->
+module.exports = (config, cb) ->
 
   if fs.existsSync(config.dest)
-    new Upload(config)
+    new Upload(config, cb)
   else
     console.log 'something went wrong'
+    cb()

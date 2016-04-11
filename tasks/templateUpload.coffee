@@ -7,8 +7,9 @@ async   = require 'async'
 
 class Upload
 
-  constructor: (config) ->
+  constructor: (config, callback) ->
 
+    @callback    = callback
     @inpath      = config.dest
     @opts        =
       apikey     : config.setup.apikey
@@ -94,10 +95,12 @@ class Upload
 
       (err) =>
         console.log 'done uploading templates...'
+        @callback()
 
-module.exports = (config) ->
+module.exports = (config, cb) ->
 
   if fs.existsSync(config.dest)
-    new Upload(config)
+    new Upload(config, cb)
   else
     console.log 'something went wrong'
+    cb()

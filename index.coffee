@@ -24,6 +24,14 @@ pkg                 = require './package.json'
 imagoConfigPath     = path.resolve(process.cwd(), './gulp.coffee')
 imagoConfig         = require imagoConfigPath
 
+if !imagoConfig.setup?.apikey and imagoConfig.setup isnt false
+  utils.reportError({message: 'Error: Please set a valid API key in your config file.'}, 'API key not set')
+  return
+
+latestVersion pkg.name, (err, version) ->
+  return if version is pkg.version
+  utils.reportError({message: "There is a newer version for the imago-gulp-angular package available (#{version})."}, 'Update Available')
+
 opts =
   ngClassify:
     constant:
@@ -66,7 +74,7 @@ gulp.task 'coffee', ->
     .pipe plugins.plumber({errorHandler: utils.reportError})
     .pipe plugins.ngClassify(opts.ngClassify)
     .pipe plugins.coffee(
-      bare: true
+      bare: false
     ).on('error', utils.reportError)
     .pipe plugins.coffeelint()
     .pipe plugins.concat imagoConfig.targets.coffee
@@ -106,7 +114,7 @@ gulp.task 'scripts', ->
 gulp.task 'index', ->
   return unless imagoConfig.paths.index
   browser =
-    apiKey: imagoConfig.setup.apiKey
+    apikey: imagoConfig.setup?.apikey
   if plugins.util.env.imagoEnv is 'dev'
     imagoSettingsHeader = '<script type="text/javascript">window.imagoSettings = ' +
             JSON.stringify(browser) +
@@ -234,17 +242,11 @@ gulp.task 'build', (cb) ->
   plugins.util.env.imagoEnv = 'production'
   runSequence 'import-assets', 'compile', 'minify', cb
 
-gulp.task 'check-update', ->
-  latestVersion pkg.name, (err, version) ->
-    if version isnt pkg.version
-      utils.reportError({message: "There is a newer version for the imago-gulp-angular package available (#{version})."}, 'Update Available')
+gulp.task 'deploy', ['build', 'customsass'], (cb) ->
+  ThemeUpload(imagoConfig, cb)
 
-gulp.task 'deploy', ['build', 'customsass'], ->
-  gulp.start 'check-update', ->
-    ThemeUpload(imagoConfig)
-
-gulp.task 'deploy-templates', ->
-  TemplateUpload(imagoConfig)
+gulp.task 'deploy-templates', (cb) ->
+  TemplateUpload(imagoConfig, cb)
 
 # START Custom Sass Developer
 
