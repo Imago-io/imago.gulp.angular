@@ -14,10 +14,7 @@ class Upload
 
     @callback    = callback
     @inpath      = config.dest
-    @opts        =
-      apikey     : config.setup.apikey
-      tenant     : config.setup.tenant
-      setdefault : config.setup.setdefault
+    @opts        = config.setup
 
     @exclude     = ['theme.yaml',
                     'index.html',
@@ -54,7 +51,7 @@ class Upload
     @domain = "https://#{@opts.tenant}.imago.io"
     if @opts.tenant in ['-admin-', '-account-']
       @domain = 'https://imago.imago.io'
-    @domain = 'http://localhost:8001' #if @opts.debug
+    @domain = 'http://localhost:8001' if @opts.debug
 
   getNextVersion: ->
     url = @domain + '/api/nextversion'
