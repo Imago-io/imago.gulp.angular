@@ -226,7 +226,8 @@ gulp.task 'import-assets', (cb) ->
 
   cb()
 
-gulp.task 'update', ['npm', 'bower'], cb
+gulp.task 'update', ['npm', 'bower'], (cb) ->
+  cb()
 
 gulp.task 'minify', ->
   gulp.src "#{imagoConfig.dest}/#{imagoConfig.targets.js}"
