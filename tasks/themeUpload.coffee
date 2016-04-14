@@ -6,6 +6,7 @@ mime    = require 'mime'
 md5     = require 'md5'
 pathMod = require 'path'
 async   = require 'async'
+_       = require 'lodash'
 
 class Upload
 
@@ -33,6 +34,11 @@ class Upload
     @totalfiles  = 0
     @callcounter = 0
 
+    @requestOpts =
+      headers: {
+        Authorization: "Basic #{@opts.apikey}:"
+      }
+
     console.log 'this inpath', @inpath
 
     @run()
@@ -48,17 +54,12 @@ class Upload
     @domain = "https://#{@opts.tenant}.imago.io"
     if @opts.tenant in ['-admin-', '-account-']
       @domain = 'https://imago.imago.io'
-    @domain = 'http://localhost:8001' if @opts.debug
+    @domain = 'http://localhost:8001' #if @opts.debug
 
   getNextVersion: ->
     url = @domain + '/api/nextversion'
 
-    opts =
-      headers: {
-        Authorization: "Basic #{@opts.apikey}:"
-      }
-
-    restler.postJson(url, {'_tenant': @opts.tenant}, opts).on 'complete', (data, response) =>
+    restler.postJson(url, {'_tenant': @opts.tenant}, _.clone(@requestOpts)).on 'complete', (data, response) =>
       if response.statusCode != 200
         console.log 'Error', data, 'statusCode:', response.statusCode, 'for nextversion request'
         return
@@ -77,7 +78,6 @@ class Upload
   walkFiles: ->
     paths        = walk.sync @inpath
     paths        = paths.filter @pathFilter
-    _this        = @
     async.eachLimit paths, 10,
       (path, cb) =>
 
@@ -90,56 +90,50 @@ class Upload
             'action'  : 'uploadurl'
             'filename': path.split('/public')[1].replace(/\.gz$/, '')
             'mimetype': mimetype
-            'version' : _this.version
-            'tenant'  : _this.opts.tenant
+            'version' : @version
+            'tenant'  : @opts.tenant
 
           isGzip = ext is '.gz'
 
-          url = "#{_this.domain}/api/themefile/upload"
-
-          opts =
-            headers: {
-              Authorization: "Basic #{_this.opts.apikey}:"
-            }
+          url = "#{@domain}/api/themefile/upload"
 
           requestUrl = (retries = 0) =>
             retries++
             time = 500 * retries
             return if retries is 5
             timeout = setTimeout (=>
-              restler.postJson(url, payload, opts).on 'complete', (gcsurl, response) =>
+              restler.postJson(url, payload, _.clone(@requestOpts)).on 'complete', (gcsurl, response) =>
                 clearTimeout(timeout)
                 unless response.statusCode is 200
                   return requestUrl(retries)
-
                 rstream = fs.createReadStream(path)
                 rstream.pipe request.put(gcsurl).on 'response', (resp) =>
                   console.log pathMod.basename(path), '...done'
                   fs.readFile path, (err, buf) =>
                     themefile =
                       isGzip  : isGzip
-                      _tenant : _this.opts.tenant
+                      _tenant : @opts.tenant
                       path    : payload.filename
-                      version : _this.version
+                      version : @version
                       md5     : md5(buf)
                       size    : stats.size
                       mimetype: mimetype
-                      gs_path : "#{_this.opts.tenant}/#{_this.version}#{payload.filename}"
+                      gs_path : "#{@opts.tenant}/#{@version}#{payload.filename}"
                     themefile.content = buf.toString() if payload.filename is '/index.jade'
-                    url = "#{_this.domain}/api/themefile"
-                    restler.postJson(url, themefile).on 'complete', (data, response) -> cb()
+                    url = "#{@domain}/api/themefile"
+                    restler.postJson(url, themefile, _.clone(@requestOpts)).on 'complete', (data, response) -> cb()
             ), time
 
           requestUrl()
       (err) =>
         console.log 'done uploading files...'
-        if _this.opts.setdefault
-          console.log 'going to set the default version to', _this.version
-          url = _this.domain + '/api/setdefault'
+        if @opts.setdefault
+          console.log 'going to set the default version to', @version
+          url = "#{@domain}/api/setdefault"
           data =
-            version: _this.version
-            _tenant: _this.opts.tenant
-          restler.postJson(url, data).on 'complete', (data, response) =>
+            version: @version
+            _tenant: @opts.tenant
+          restler.postJson(url, data, @requestOpts).on 'complete', (data, response) =>
             console.log 'all done!'
             @callback()
         else

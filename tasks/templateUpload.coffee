@@ -18,6 +18,10 @@ class Upload
     @domain      = ''
     console.log 'this inpath', @inpath
 
+    @requestOpts =
+      headers: {
+        Authorization: "Basic #{@opts.apikey}:"
+      }
     @run()
 
   run: ->
@@ -33,11 +37,7 @@ class Upload
     @endpoint = "#{@domain}/v1/templates"
 
   clearTemplates: (cb) ->
-    opts =
-      headers: {
-        Authorization: "Basic #{@opts.apikey}:"
-      }
-    restler.del(@endpoint, opts).on 'complete', -> cb()
+    restler.del(@endpoint, @requestOpts).on 'complete', -> cb()
 
   pathFilter: (path) =>
     fname = path.split('/')[path.split('/').length-1]
@@ -49,12 +49,8 @@ class Upload
   postTemplates: (templateObj, cb) ->
     # console.log 'endpoint', endpoint
     # console.log 'apikey', @opts.apikey
-    opts =
-      headers: {
-        Authorization: "Basic #{@opts.apikey}:"
-      }
 
-    restler.postJson(@endpoint, templateObj, opts).on 'complete', (data, response) ->
+    restler.postJson(@endpoint, templateObj, @requestOpts).on 'complete', (data, response) ->
       if response.statusCode != 200
         console.log 'Error', data, 'statusCode:', response.statusCode, 'for file', templateObj.name
         cb()
@@ -66,7 +62,6 @@ class Upload
   walkFiles: ->
     paths        = walk.sync @inpath + '/templates'
     paths        = paths.filter @pathFilter
-    _this        = @
     async.eachLimit paths, 10,
       (path, cb) =>
 
