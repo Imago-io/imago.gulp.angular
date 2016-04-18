@@ -48,11 +48,15 @@ class Upload
     @getNextVersion()
 
   getDomain: ->
+    # @domain = "https://#{@tenant}.imago.io"
+    # if @tenant in ['-admin-', '-account-']
     @domain = 'https://app.imago.io'
     @domain = 'http://localhost:8001' if @opts.debug
 
   getNextVersion: ->
     url = "#{@domain}/api/nextversion"
+
+    # console.log 'url getNextVersion', url
 
     restler.postJson(url, {}, _.clone(@requestOpts)).on 'complete', (data, response) =>
       if response.statusCode != 200
@@ -60,7 +64,7 @@ class Upload
         return
       @version  = parseInt data.version
       @tenant   = data.tenant
-      console.log 'themeversion is', @version
+      console.log 'themeversion is', @version, 'tenant', @tenant
       @walkFiles()
 
   pathFilter: (path) =>
@@ -116,6 +120,7 @@ class Upload
                       gs_path : "#{@tenant}/#{@version}#{payload.filename}"
                     themefile.content = buf.toString() if payload.filename is '/index.jade'
                     url = "#{@domain}/api/themefile"
+
                     restler.postJson(url, themefile, _.clone(@requestOpts)).on 'complete', (data, response) -> cb()
             ), time
 
