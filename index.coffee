@@ -115,10 +115,9 @@ gulp.task 'index', ->
   return unless imagoConfig.paths.index
   browser =
     apikey: imagoConfig.setup?.apikey
-  if plugins.util.env.imagoEnv is 'dev'
-    imagoSettingsHeader = '<script type="text/javascript">window.imagoSettings = ' +
-            JSON.stringify(browser) +
-            '</script>'
+  imagoSettingsHeader = '<script type="text/javascript">window.imagoSettings = ' +
+          JSON.stringify(browser) +
+          '</script>'
 
   gulp.src imagoConfig.paths.index
     .pipe plugins.plumber(
@@ -129,7 +128,7 @@ gulp.task 'index', ->
       pretty: true
       ).on('error', utils.reportError)
 
-    .pipe(plugins.if(plugins.util.env.imagoEnv is 'dev', plugins.injectString.after('<head>', imagoSettingsHeader)))
+    .pipe plugins.injectString.after('<head>', imagoSettingsHeader)
     .pipe gulp.dest imagoConfig.dest
 
 gulp.task 'combine', ->
