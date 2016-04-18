@@ -54,7 +54,7 @@ class Upload
   getNextVersion: ->
     url = "#{@domain}/api/nextversion"
 
-    restler.postJson(url, {'_tenant': @tenant}, _.clone(@requestOpts)).on 'complete', (data, response) =>
+    restler.postJson(url, {}, _.clone(@requestOpts)).on 'complete', (data, response) =>
       if response.statusCode != 200
         console.log 'Error', data, 'statusCode:', response.statusCode, 'for nextversion request'
         return
