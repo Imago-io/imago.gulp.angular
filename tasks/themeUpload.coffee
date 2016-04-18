@@ -14,10 +14,7 @@ class Upload
 
     @callback    = callback
     @inpath      = config.dest
-    @opts        =
-      apikey     : config.setup.apikey
-      tenant     : config.setup.tenant
-      setdefault : config.setup.setdefault
+    @opts        = config.setup
 
     @exclude     = ['theme.yaml',
                     'index.html',
@@ -51,19 +48,20 @@ class Upload
     @getNextVersion()
 
   getDomain: ->
-    @domain = "https://#{@opts.tenant}.imago.io"
-    if @opts.tenant in ['-admin-', '-account-']
-      @domain = 'https://imago.imago.io'
-    @domain = 'http://localhost:8001' #if @opts.debug
+    # @domain = "https://#{@tenant}.imago.io"
+    # if @tenant in ['-admin-', '-account-']
+    @domain = 'https://app.imago.io'
+    @domain = 'http://localhost:8001' if @opts.debug
 
   getNextVersion: ->
-    url = @domain + '/api/nextversion'
+    url = "#{@domain}/api/nextversion"
 
-    restler.postJson(url, {'_tenant': @opts.tenant}, _.clone(@requestOpts)).on 'complete', (data, response) =>
+    restler.postJson(url, {'_tenant': @tenant}, _.clone(@requestOpts)).on 'complete', (data, response) =>
       if response.statusCode != 200
         console.log 'Error', data, 'statusCode:', response.statusCode, 'for nextversion request'
         return
-      @version = parseInt data
+      @version  = parseInt data.version
+      @tenant   = data.tenant
       console.log 'themeversion is', @version
       @walkFiles()
 
@@ -91,7 +89,7 @@ class Upload
             'filename': path.split('/public')[1].replace(/\.gz$/, '')
             'mimetype': mimetype
             'version' : @version
-            'tenant'  : @opts.tenant
+            'tenant'  : @tenant
 
           isGzip = ext is '.gz'
 
@@ -112,13 +110,12 @@ class Upload
                   fs.readFile path, (err, buf) =>
                     themefile =
                       isGzip  : isGzip
-                      _tenant : @opts.tenant
                       path    : payload.filename
                       version : @version
                       md5     : md5(buf)
                       size    : stats.size
                       mimetype: mimetype
-                      gs_path : "#{@opts.tenant}/#{@version}#{payload.filename}"
+                      gs_path : "#{@tenant}/#{@version}#{payload.filename}"
                     themefile.content = buf.toString() if payload.filename is '/index.jade'
                     url = "#{@domain}/api/themefile"
                     restler.postJson(url, themefile, _.clone(@requestOpts)).on 'complete', (data, response) -> cb()
@@ -132,8 +129,7 @@ class Upload
           url = "#{@domain}/api/setdefault"
           data =
             version: @version
-            _tenant: @opts.tenant
-          restler.postJson(url, data, @requestOpts).on 'complete', (data, response) =>
+          restler.postJson(url, data, _.clone(@requestOpts)).on 'complete', (data, response) =>
             console.log 'all done!'
             @callback()
         else
