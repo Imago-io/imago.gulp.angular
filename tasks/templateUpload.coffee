@@ -11,10 +11,7 @@ class Upload
 
     @callback    = callback
     @inpath      = config.dest
-    @opts        =
-      apikey     : config.setup.apikey
-      tenant     : config.setup.tenant
-      setdefault : config.setup.setDefault
+    @opts        = config.setup
     @domain      = ''
     console.log 'this inpath', @inpath
 

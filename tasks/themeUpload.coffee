@@ -48,8 +48,6 @@ class Upload
     @getNextVersion()
 
   getDomain: ->
-    # @domain = "https://#{@tenant}.imago.io"
-    # if @tenant in ['-admin-', '-account-']
     @domain = 'https://app.imago.io'
     @domain = 'http://localhost:8001' if @opts.debug
 

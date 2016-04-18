@@ -267,21 +267,21 @@ gulp.task 'customsass', ->
     .pipe gulp.dest imagoConfig.dest
 
 gulp.task 'watch-customsass', ->
-  return 'no path for customSass found' unless imagoConfig.paths.customSass
-  options =
-    files: ["#{imagoConfig.dest}/#{imagoConfig.targets.customCss}"]
-    proxy: "https://#{yamlOpts.tenant}.imago.io/account/checkout/--ID--",
-    serveStatic: [imagoConfig.dest]
-    rewriteRules: [
-      {
-        match: /(latest\/custom\.min\.css)/
-        fn: (match) ->
-          return imagoConfig.targets.customCss
-      }
-    ]
+  utils.getTenant imagoConfig, (tenant) ->
+    options =
+      files: ["#{imagoConfig.dest}/#{imagoConfig.targets.customCss}"]
+      proxy: "https://#{tenant}.imago.io/account/checkout/--ID--",
+      serveStatic: [imagoConfig.dest]
+      rewriteRules: [
+        {
+          match: /(latest\/custom\.min\.css)/
+          fn: (match) ->
+            return imagoConfig.targets.customCss
+        }
+      ]
 
-  browserSync.init options
-  gulp.watch(imagoConfig.paths.customSass, ['customsass'])
+    browserSync.init options
+    gulp.watch(imagoConfig.paths.customSass, ['customsass'])
 
 # END Custom Sass Developer
 
