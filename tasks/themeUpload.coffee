@@ -117,6 +117,7 @@ class Upload
                       md5     : md5(buf)
                       size    : stats.size
                       mimetype: mimetype
+                      _tenant : @tenant
                       gs_path : "#{@tenant}/#{@version}#{payload.filename}"
                     themefile.content = buf.toString() if payload.filename is '/index.jade'
                     url = "#{@domain}/api/themefile"
@@ -132,6 +133,7 @@ class Upload
           url = "#{@domain}/api/setdefault"
           data =
             version: @version
+            _tenant: @tenant
           restler.postJson(url, data, _.clone(@requestOpts)).on 'complete', (data, response) =>
             console.log 'all done!'
             @callback()
