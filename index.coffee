@@ -34,6 +34,8 @@ latestVersion pkg.name, (err, version) ->
 
 opts =
   ngClassify:
+    component:
+      format: 'camelCase'
     constant:
       format: 'camelCase'
       prefix: ''
@@ -202,6 +204,7 @@ gulp.task 'watch', ->
       delete require.cache[require.resolve(imagoConfigPath)]
       imagoConfig = require imagoConfigPath
       gulp.start('scripts')
+      gulp.start('index')
 
 gulp.task 'bower', (cb) ->
   exec 'bower install; bower update', (err, stdout, stderr) ->

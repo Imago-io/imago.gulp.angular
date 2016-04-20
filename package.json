@@ -1,6 +1,6 @@
 {
   "name": "imago-gulp-angular",
-  "version": "1.0.45",
+  "version": "1.0.46",
   "description": "AngularJs tools | Imago.io",
   "main": "./index.js",
   "scripts": {
@@ -25,7 +25,7 @@
     "gulp-inject-string": "~1",
     "gulp-jade": "*",
     "gulp-load-plugins": "*",
-    "gulp-ng-classify": "*",
+    "gulp-ng-classify": "Imago-io/gulp-ng-classify#master",
     "gulp-plumber": "*",
     "gulp-protractor": "0.0.11",
     "gulp-rename": "^1.2.0",
