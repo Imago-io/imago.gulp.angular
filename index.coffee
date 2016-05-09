@@ -14,7 +14,6 @@ modifyFilename      = require 'modify-filename'
 
 latestVersion       = require 'latest-version'
 fs                  = require 'fs'
-crypto              = require 'crypto'
 del                 = require 'del'
 utils               = require './tasks/themeUtils'
 ThemeUpload         = require './tasks/themeUpload'
@@ -33,6 +32,16 @@ latestVersion pkg.name, (err, version) ->
   utils.reportError({message: "There is a newer version for the imago-gulp-angular package available (#{version})."}, 'Update Available')
 
 opts =
+  browserSync:
+    server:
+      baseDir: "#{imagoConfig.dest}"
+      middleware: [
+        modRewrite ['^([^\\.]+)(\\?.+)?$ /index.html [L]']
+      ]
+    debugInfo: false
+    notify: false
+  uglify:
+    mangle: false
   ngClassify:
     component:
       format: 'camelCase'
@@ -54,6 +63,10 @@ opts =
       suffix: ''
     value:
       format: 'camelCase'
+
+if _.isPlainObject imagoConfig.opts
+  for key, value of imagoConfig.opts
+    _.assign opts[key], imagoConfig.opts[key]
 
 gulp.task 'sass', ->
   gulp.src(imagoConfig.paths.sass)
@@ -158,19 +171,7 @@ gulp.task 'compile', ['index', 'sass', 'js'], (cb) ->
   runSequence 'combine', cb
 
 gulp.task 'browser-sync', ->
-  options =
-    server:
-      baseDir: "#{imagoConfig.dest}"
-      middleware: [
-        modRewrite ['^([^\\.]+)(\\?.+)?$ /index.html [L]']
-      ]
-    debugInfo: false
-    notify: false
-
-  if _.isPlainObject imagoConfig.browserSync
-    _.assign options, imagoConfig.browserSync
-
-  browserSync.init ["#{imagoConfig.dest}/index.html"], options
+  browserSync.init ["#{imagoConfig.dest}/index.html"], opts.browserSync
 
 gulp.task 'watch', ->
   plugins.util.env.imagoEnv = 'dev'
@@ -233,8 +234,7 @@ gulp.task 'update', ['npm', 'bower'], (cb) ->
 
 gulp.task 'minify', ->
   gulp.src "#{imagoConfig.dest}/#{imagoConfig.targets.js}"
-    .pipe plugins.uglify
-      mangle: false
+    .pipe plugins.uglify(opts.uglify)
     .pipe plugins.rename('application.min.js')
     .pipe gulp.dest imagoConfig.dest
     .pipe plugins.gzip()
@@ -272,7 +272,7 @@ gulp.task 'watch-customsass', ->
   utils.getTenant imagoConfig, (tenant) ->
     options =
       files: ["#{imagoConfig.dest}/#{imagoConfig.targets.customCss}"]
-      proxy: "https://#{tenant}.imago.io/account/checkout/--ID--",
+      proxy: "https://#{tenant}.imago.io/account/checkout/--ID--"
       serveStatic: [imagoConfig.dest]
       rewriteRules: [
         {
@@ -281,6 +281,19 @@ gulp.task 'watch-customsass', ->
             return imagoConfig.targets.customCss
         }
       ]
+      snippetOptions:
+        rule:
+          match: /<\/body>/i
+          fn: (snippet, match) ->
+            snippet += """
+              <script>
+                angular.module('app')
+                .config(function($httpProvider){
+                  $httpProvider.defaults.headers.common.Authorization = 'Basic #{imagoConfig.setup.apikey}:'
+                })
+              </script>
+            """
+            return snippet + match
 
     browserSync.init options
     gulp.watch(imagoConfig.paths.customSass, ['customsass'])
@@ -343,15 +356,9 @@ gulp.task 'rev-create', ->
       )
       cb null, file
     else
-      checksum = (str, algorithm, encoding) ->
-        return crypto
-          .createHash(algorithm || 'md5')
-          .update(str, 'utf8')
-          .digest(encoding || 'hex')
-
       fs.readFile file.revOrigPath, (err, data) ->
         file.path = modifyFilename(file.revOrigPath, (name, ext) ->
-          return "#{checksum(data)}-#{name}#{ext}"
+          return "#{utils.checksum(data)}-#{name}#{ext}"
         )
         cb null, file
     return
