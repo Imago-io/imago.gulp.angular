@@ -15,6 +15,7 @@ class Upload
     @callback    = callback
     @inpath      = config.dest
     @opts        = config.setup
+    @apikey      = @opts.deploykey or @opts.apikey
 
     @exclude     = ['theme.yaml',
                     'index.html',
@@ -33,7 +34,7 @@ class Upload
 
     @requestOpts =
       headers: {
-        Authorization: "Basic #{@opts.apikey}:"
+        Authorization: "Basic #{@apikey}:"
       }
 
     console.log 'this inpath', @inpath
