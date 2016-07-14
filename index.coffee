@@ -28,7 +28,7 @@ if !imagoConfig.setup?.apikey and imagoConfig.setup isnt false
   return
 
 latestVersion pkg.name, (err, version) ->
-  return if version is pkg.version
+  return if err or version is pkg.version
   utils.reportError({message: "There is a newer version for the imago-gulp-angular package available (#{version})."}, 'Update Available')
 
 opts =
