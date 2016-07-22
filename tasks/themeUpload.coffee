@@ -109,7 +109,7 @@ class Upload
                   return requestUrl(retries)
                 rstream = fs.createReadStream(path)
                 rstream.pipe request.put(gcsurl).on 'response', (resp) =>
-                  console.log pathMod.basename(path), '...done'
+                  console.log pathMod.basename(path), '...done: ', resp.statusCode
                   fs.readFile path, (err, buf) =>
                     themefile =
                       isGzip  : isGzip

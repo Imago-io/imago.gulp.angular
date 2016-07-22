@@ -1,6 +1,6 @@
 {
   "name": "imago-gulp-angular",
-  "version": "1.0.51",
+  "version": "1.0.53",
   "description": "AngularJs tools | Imago.io",
   "main": "./index.js",
   "scripts": {
@@ -21,6 +21,7 @@
     "gulp-concat": "*",
     "gulp-flatten": "0.0.4",
     "gulp-gzip": "^1.1.0",
+    "gulp-help": "^1.6.1",
     "gulp-if": "^2.0.0",
     "gulp-inject-string": "~1",
     "gulp-jade": "*",
@@ -62,7 +63,7 @@
     "type": "git",
     "url": "https://github.com/Imago-io/imago.gulp.angular"
   },
-  "_id": "imago-gulp-angular@0.0.5",
-  "_from": "imago-gulp-angular@~0.0.5",
+  "_id": "imago-gulp-angular@1.0.53",
+  "_from": "imago-gulp-angular@~1.0.53",
   "readme": "Imago Gulp Angular"
 }
