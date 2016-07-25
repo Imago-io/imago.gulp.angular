@@ -14,7 +14,7 @@
     "browser-sync": "~2",
     "connect-modrewrite": "*",
     "del": "^2.0.2",
-    "gulp-angular-templatecache": "*",
+    "gulp-angular-templatecache": "~1.9.1",
     "gulp-autoprefixer": "*",
     "gulp-coffee": "*",
     "gulp-coffeelint": "*",
