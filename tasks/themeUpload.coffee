@@ -105,7 +105,8 @@ class Upload
             timeout = setTimeout (=>
               restler.postJson(url, payload, _.clone(@requestOpts)).on 'complete', (gcsurl, response) =>
                 clearTimeout(timeout)
-                unless response.statusCode is 200
+                unless response?.statusCode is 200
+                  console.log "retrying #{retries+1} times to get upload url for #{payload.filename}"
                   return requestUrl(retries)
                 rstream = fs.createReadStream(path)
                 rstream.pipe request.put(gcsurl).on 'response', (resp) =>
