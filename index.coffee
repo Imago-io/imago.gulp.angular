@@ -23,6 +23,8 @@ pkg                 = require './package.json'
 imagoConfigPath     = path.resolve(process.cwd(), './gulp.coffee')
 imagoConfig         = require imagoConfigPath
 
+gulpHelp    = require('gulp-help')(require('gulp'))
+
 if !imagoConfig.setup?.apikey and imagoConfig.setup isnt false
   utils.reportError({message: 'Error: Please set a valid API key in your config file.'}, 'API key not set')
   return

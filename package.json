@@ -1,6 +1,6 @@
 {
   "name": "imago-gulp-angular",
-  "version": "1.0.54",
+  "version": "1.0.55",
   "description": "AngularJs tools | Imago.io",
   "main": "./index.js",
   "scripts": {
@@ -10,6 +10,7 @@
     "name": "Nex9 LLC"
   },
   "dependencies": {
+    "gulp-help": "*",
     "async": "*",
     "browser-sync": "~2",
     "connect-modrewrite": "*",
