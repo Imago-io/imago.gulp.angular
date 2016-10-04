@@ -235,7 +235,6 @@ gulp.task 'update', ['npm', 'bower'], (cb) ->
   cb()
 
 gulp.task 'minify', ->
-  console.log "****"
   gulp.src "#{imagoConfig.dest}/#{imagoConfig.targets.js}"
     .pipe plugins.uglify(opts.uglify)
     .pipe plugins.rename('application.min.js')
