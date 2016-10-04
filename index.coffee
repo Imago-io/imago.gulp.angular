@@ -82,7 +82,7 @@ gulp.task 'sass', ->
     .pipe browserSync.reload(stream: true)
     .pipe plugins.rename('application.min.css')
     .pipe gulp.dest imagoConfig.dest
-    .pipe plugins.gzip()
+    .pipe plugins.gzip( level: 1 )
     .pipe plugins.plumber.stop()
     .pipe gulp.dest imagoConfig.dest
 
@@ -235,11 +235,12 @@ gulp.task 'update', ['npm', 'bower'], (cb) ->
   cb()
 
 gulp.task 'minify', ->
+  console.log "****"
   gulp.src "#{imagoConfig.dest}/#{imagoConfig.targets.js}"
     .pipe plugins.uglify(opts.uglify)
     .pipe plugins.rename('application.min.js')
     .pipe gulp.dest imagoConfig.dest
-    .pipe plugins.gzip()
+    .pipe plugins.gzip( level: 1 )
     .pipe gulp.dest imagoConfig.dest
 
 gulp.task 'build', (cb) ->
@@ -266,7 +267,7 @@ gulp.task 'customsass', ->
     .pipe gulp.dest imagoConfig.dest
     .pipe browserSync.reload(stream: true)
     .pipe plugins.rename('custom.min.css')
-    .pipe plugins.gzip()
+    .pipe plugins.gzip( level: 1 )
     .pipe plugins.plumber.stop()
     .pipe gulp.dest imagoConfig.dest
 
