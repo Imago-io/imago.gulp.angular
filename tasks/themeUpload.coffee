@@ -51,8 +51,8 @@ class Upload
   getDomain: ->
     # @domain = "https://#{@tenant}.imago.io"
     # if @tenant in ['-admin-', '-account-']
-    @domain = 'https://app.imago.io'
-    @domain = 'http://localhost:8001' if @opts.debug
+    @domain = 'https://api.imago.io'
+    @domain = 'http://localhost:8000' if @opts.debug
 
   getNextVersion: ->
     url = "#{@domain}/api/nextversion"
