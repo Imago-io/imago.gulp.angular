@@ -278,7 +278,7 @@ gulp.task 'watch-customsass', ->
       serveStatic: [imagoConfig.dest]
       rewriteRules: [
         {
-          match: /(latest\/custom\.min\.css)/
+          match: /https:.*custom\.min\.css/
           fn: (match) ->
             return imagoConfig.targets.customCss
         }
