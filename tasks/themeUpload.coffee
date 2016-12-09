@@ -51,8 +51,8 @@ class Upload
   getDomain: ->
     # @domain = "https://#{@tenant}.imago.io"
     # if @tenant in ['-admin-', '-account-']
-    @domain = 'https://app.imago.io'
-    @domain = 'http://localhost:8001' if @opts.debug
+    @domain = 'https://api.imago.io'
+    @domain = 'http://localhost:8000' if @opts.debug
 
   getNextVersion: ->
     url = "#{@domain}/api/nextversion"
@@ -108,8 +108,15 @@ class Upload
                 unless response?.statusCode is 200
                   console.log "retrying #{retries+1} times to get upload url for #{payload.filename}"
                   return requestUrl(retries)
+
                 rstream = fs.createReadStream(path)
-                rstream.pipe request.put(gcsurl).on 'response', (resp) =>
+                req     = rstream.pipe request.put(gcsurl)
+
+                req.on 'error', (err) ->
+                  console.log "error on GCS upload #{err.code} for #{pathMod.basename(path)} ... retrying"
+                  return requestUrl(retries)
+
+                req.on 'response', (resp) =>
                   console.log pathMod.basename(path), '...done: ', resp.statusCode
                   fs.readFile path, (err, buf) =>
                     themefile =
