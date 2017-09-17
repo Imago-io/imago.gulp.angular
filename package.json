@@ -1,6 +1,6 @@
 {
   "name": "imago-gulp-angular",
-  "version": "1.0.59",
+  "version": "1.0.62",
   "description": "AngularJs tools | Imago.io",
   "main": "./index.js",
   "scripts": {
@@ -63,7 +63,7 @@
     "type": "git",
     "url": "https://github.com/Imago-io/imago.gulp.angular"
   },
-  "_id": "imago-gulp-angular@1.0.59",
+  "_id": "imago-gulp-angular@1.0.62",
   "_from": "git://github.com/Imago-io/imago.gulp.angular.git",
   "readme": "Imago Gulp Angular",
   "gitHead": "0ae482303ed4f67c0d97d06651edc7e5ae84db98",
