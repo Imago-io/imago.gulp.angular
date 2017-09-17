@@ -83,7 +83,9 @@ class Upload
       (path, cb) =>
 
         ext      = pathMod.extname path
-        mimetype = mime.lookup path.replace(/\.gz$/, '')
+        mimetype = mime.getType path.replace(/\.gz$/, '')
+
+        console.log 'mimetype', mimetype
 
         stats = fs.stat path, (err, stats) =>
 

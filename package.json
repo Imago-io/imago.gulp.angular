@@ -1,6 +1,6 @@
 {
   "name": "imago-gulp-angular",
-  "version": "1.0.61",
+  "version": "1.0.59",
   "description": "AngularJs tools | Imago.io",
   "main": "./index.js",
   "scripts": {
@@ -26,7 +26,7 @@
     "gulp-inject-string": "*",
     "gulp-jade": "*",
     "gulp-load-plugins": "*",
-    "gulp-ng-classify": "Imago-io/gulp-ng-classify#master",
+    "gulp-ng-classify": "git+https://github.com/Imago-io/gulp-ng-classify#master",
     "gulp-plumber": "*",
     "gulp-protractor": "*",
     "gulp-rename": "*",
@@ -63,7 +63,15 @@
     "type": "git",
     "url": "https://github.com/Imago-io/imago.gulp.angular"
   },
-  "_id": "imago-gulp-angular@1.0.61",
-  "_from": "imago-gulp-angular@~1.0.61",
-  "readme": "Imago Gulp Angular"
+  "_id": "imago-gulp-angular@1.0.59",
+  "_from": "git://github.com/Imago-io/imago.gulp.angular.git",
+  "readme": "Imago Gulp Angular",
+  "gitHead": "0ae482303ed4f67c0d97d06651edc7e5ae84db98",
+  "bugs": {
+    "url": "https://github.com/Imago-io/imago.gulp.angular/issues"
+  },
+  "homepage": "https://github.com/Imago-io/imago.gulp.angular",
+  "_shasum": "a222b8fac357c9676769d2b9cb53414e24ce2592",
+  "_resolved": "git://github.com/Imago-io/imago.gulp.angular.git#0ae482303ed4f67c0d97d06651edc7e5ae84db98",
+  "_fromGithub": true
 }
