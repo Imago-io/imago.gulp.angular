@@ -1,6 +1,7 @@
 gulp                = require 'gulp'
 plugins             = require('gulp-load-plugins')()
 browserSync         = require 'browser-sync'
+cors                = require 'cors'
 
 runSequence         = require 'run-sequence'
 
@@ -40,6 +41,7 @@ opts =
       middleware: [
         modRewrite ['^([^\\.]+)(\\?.+)?$ /index.html [L]']
       ]
+    cors: true
     debugInfo: false
     notify: false
   uglify:
@@ -236,7 +238,7 @@ gulp.task 'update', ['npm', 'bower'], (cb) ->
 
 gulp.task 'minify', ->
   gulp.src "#{imagoConfig.dest}/#{imagoConfig.targets.js}"
-    .pipe plugins.uglify(opts.uglify)
+    .pipe plugins.uglifyEs.default(opts.uglify)
     .pipe plugins.rename('application.min.js')
     .pipe gulp.dest imagoConfig.dest
     .pipe plugins.gzip( level: 1 )
