@@ -1,6 +1,6 @@
 {
   "name": "imago-gulp-angular",
-  "version": "1.0.66",
+  "version": "1.0.67",
   "description": "AngularJs tools | Imago.io",
   "main": "./index.js",
   "scripts": {
@@ -11,13 +11,15 @@
   },
   "dependencies": {
     "async": "^2.6.1",
-    "browser-sync": "^2.24.4",
+    "browser-sync": "^2.24.5",
+    "coffee-script": "^1.12.7",
+    "coffeescript": "^1.12.7",
     "connect-modrewrite": "*",
     "cors": "^2.8.4",
     "del": "*",
     "gulp-angular-templatecache": "*",
     "gulp-autoprefixer": "*",
-    "gulp-coffee": "^3.0.2",
+    "gulp-coffee": "^2.3.5",
     "gulp-coffeelint": "*",
     "gulp-concat": "*",
     "gulp-flatten": "*",
@@ -30,7 +32,7 @@
     "gulp-ng-classify": "git+https://github.com/Imago-io/gulp-ng-classify#master",
     "gulp-plumber": "*",
     "gulp-protractor": "*",
-    "gulp-rename": "^1.2.3",
+    "gulp-rename": "^1.3.0",
     "gulp-rev": "*",
     "gulp-sass": "^4.0.1",
     "gulp-sketch": "*",
@@ -64,7 +66,7 @@
     "type": "git",
     "url": "https://github.com/Imago-io/imago.gulp.angular"
   },
-  "_id": "imago-gulp-angular@1.0.66",
+  "_id": "imago-gulp-angular@1.0.67",
   "_from": "git://github.com/Imago-io/imago.gulp.angular.git",
   "readme": "Imago Gulp Angular",
   "gitHead": "0ae482303ed4f67c0d97d06651edc7e5ae84db98",
