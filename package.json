@@ -12,13 +12,13 @@
   "dependencies": {
     "async": "^2.6.1",
     "browser-sync": "^2.24.5",
-    "coffee-script": "^1.12.7",
+    "coffee-script": "npm:coffeescript@^1.12.7",
     "coffeescript": "^1.12.7",
     "connect-modrewrite": "*",
     "cors": "^2.8.4",
     "del": "*",
     "gulp-angular-templatecache": "*",
-    "gulp-autoprefixer": "*",
+    "gulp-autoprefixer": "^7.0.1",
     "gulp-coffee": "^2.3.5",
     "gulp-coffeelint": "*",
     "gulp-concat": "*",
@@ -75,6 +75,6 @@
   },
   "homepage": "https://github.com/Imago-io/imago.gulp.angular",
   "_shasum": "a222b8fac357c9676769d2b9cb53414e24ce2592",
-  "_resolved": "git://github.com/Imago-io/imago.gulp.angular.git#0ae482303ed4f67c0d97d06651edc7e5ae84db98",
+  "_resolved": "https://github.com/Imago-io/imago.gulp.angular",
   "_fromGithub": true
 }
